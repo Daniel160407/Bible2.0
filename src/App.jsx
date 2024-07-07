@@ -3,7 +3,7 @@ import SearchPanel from './components/SearchPanel'
 import Verses from './components/Verses';
 import Controller from './components/control/Controller';
 
-function App() {
+const App = () => {
   const [versesToDisplay, setVersesToDisplay] = useState([]);
   const [bookToDisplay, setBookToDisplay] = useState('');
   

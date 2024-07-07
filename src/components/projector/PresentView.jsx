@@ -18,14 +18,18 @@ const PresentView = () => {
 
     return (
         <div id="present-view">
-            {show && versesToDisplay.length > 0 && (
-                versesToDisplay.map(verse => (
+            <div id="verses">
+                {show && versesToDisplay.length > 0 && (
+                    versesToDisplay.map(verse => (
                     <div key={verse.id} className="verse">
                         <h1 className="verse-text">{verse.bv}</h1>
-                        <h1 className="verse-reference">{booksToDisplay} {verse.tavi}:{verse.muxli}</h1>
                     </div>
                 ))
             )}
+            <h1 className="verse-reference">{booksToDisplay} {versesToDisplay[0].tavi}:
+                {versesToDisplay.length === 1 ? versesToDisplay[0].muxli 
+                : `${versesToDisplay[0].muxli} - ${versesToDisplay[versesToDisplay.length-1].muxli}`}</h1>
+            </div>
         </div>
     );
 }
