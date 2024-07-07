@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SearchPanel from './components/SearchPanel'
 import Verses from './components/Verses';
+import Controller from './components/control/Controller';
 
 function App() {
   const [versesToDisplay, setVersesToDisplay] = useState([]);
@@ -10,6 +11,7 @@ function App() {
     <>
       <SearchPanel setVersesToDisplay={setVersesToDisplay} setBookToDisplay={setBookToDisplay}/>
       <Verses versesToDisplay={versesToDisplay} bookToDisplay={bookToDisplay}/>
+      <Controller versesToDisplay={versesToDisplay} booksToDisplay={bookToDisplay}/>
     </>
   )
 }

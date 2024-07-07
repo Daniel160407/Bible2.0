@@ -1,17 +1,15 @@
-// Dark-themed select styling
-
-$select-bg: #333; // Background color
-$select-color: #fff; // Text color
-$select-border: 1px solid #555; // Border color
-$select-focus-outline: 2px solid #007bff; // Focus outline color
-$select-padding: 0.5rem; // Padding
+$select-bg: #374151;
+$select-color: #fff;
+$select-border: 1px solid #555;
+$select-focus-outline: 2px solid #007bff;
+$select-padding: 0.5rem;
 
 #searchPanel {
     display: flex;
     gap: 10px;
 
     select {
-  appearance: none; // Removes default appearance
+  appearance: none;
   background-color: $select-bg;
   border: $select-border;
   color: $select-color;
@@ -19,17 +17,17 @@ $select-padding: 0.5rem; // Padding
   font-size: 1rem;
   line-height: 1.5;
   cursor: pointer;
-  outline: none; // Removes default focus outline
+  outline: none;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   border-radius: 10px;
 
   &:hover,
   &:focus {
-    border-color: #007bff; // Highlight on hover/focus
+    border-color: #007bff;
   }
 
   &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); // Focus shadow
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
   option {
     padding: 10px;
