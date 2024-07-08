@@ -1,11 +1,15 @@
 import axios from "axios";
-import { useEffect, useState, version } from "react";
+import { useEffect, useState } from "react";
 import '../../style/ProjectorController.scss';
 
-const ProjectorController = ({ setShow, setClear }) => {
+const ProjectorController = ({ setShow, setClear, setVersions, setLanguages }) => {
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
+
+    const [selectedGeoVersion, setSelectedGeoVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
+    const [selectedEngVersion, setSelectedEngVersion] = useState('NASB New American Standard Bible');
+    const [selectedRusVersion, setSelectedRusVersion] = useState('Синодальный перевод');
 
     useEffect(() => {
         axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=geo&page=1')
@@ -22,7 +26,67 @@ const ProjectorController = ({ setShow, setClear }) => {
             .then(response => {
                 setRusVersions(response.data.versions);
             });
+        
+        const versions = {
+            geo: selectedGeoVersion,
+            eng: selectedEngVersion,
+            rus: selectedRusVersion
+        }
+
+        setVersions(versions);
     }, []);
+
+    const handleGeoVersionsChange = (e) => {
+        if (document.getElementById('georgian').checked) {
+            setVersions(prevVersions => ({
+                ...prevVersions,
+                geo: e.target.value
+            }));
+            setSelectedGeoVersion(e.target.value);
+        }
+    };
+
+    const handleEngVersionsChange = (e) => {
+        if (document.getElementById('english').checked) {
+            setVersions(prevVersions => ({
+                ...prevVersions,
+                eng: e.target.value
+            }));
+            setSelectedEngVersion(e.target.value);
+        }
+    };
+
+    const handleRusVersionsChange = (e) => {
+        if (document.getElementById('russian').checked) {
+            setVersions(prevVersions => ({
+                ...prevVersions,
+                rus: e.target.value
+            }));
+            setSelectedRusVersion(e.target.value);
+        }
+    };
+
+    const handleGeoCheckboxChange = (e) => {
+        console.log(e.target.checked);
+        setLanguages(prevLanguages => ({
+            ...prevLanguages,
+            geo: e.target.checked
+        }));
+    };
+
+    const handleEngCheckboxChange = (e) => {
+        setLanguages(prevLanguages => ({
+            ...prevLanguages,
+            eng: e.target.checked
+        }));
+    };
+
+    const handleRusCheckboxChange = (e) => {
+        setLanguages(prevLanguages => ({
+            ...prevLanguages,
+            rus: e.target.checked
+        }));
+    };
 
     return (
         <div id="control">
@@ -38,28 +102,28 @@ const ProjectorController = ({ setShow, setClear }) => {
             </div>
             <div className="selection">
                 <label htmlFor="georgian">Georgian</label>
-                <input id="georgian" type="checkbox"></input>
-                <select id="geoVersions">
+                <input id="georgian" type="checkbox" onChange={handleGeoCheckboxChange}></input>
+                <select id="geoVersions" value={selectedGeoVersion} onChange={handleGeoVersionsChange}>
                     {geoVersions.map(version => (
-                        <option key={version}>{version}</option>
+                        <option key={version} value={version}>{version}</option>
                     ))}
                 </select>
             </div>
             <div className="selection">
                 <label htmlFor="english">English</label>
-                <input id="english" type="checkbox"></input>
-                <select id="engVersions">
+                <input id="english" type="checkbox" onChange={handleEngCheckboxChange}></input>
+                <select id="engVersions" value={selectedEngVersion} onChange={handleEngVersionsChange}>
                     {engVersions.map(version => (
-                        <option key={version}>{version}</option>
+                        <option key={version} value={version}>{version}</option>
                     ))}
                 </select>
             </div>
             <div className="selection">
                 <label htmlFor="russian">Russian</label>
-                <input id="russian" type="checkbox"></input>
-                <select id="rusVersions">
+                <input id="russian" type="checkbox" onChange={handleRusCheckboxChange}></input>
+                <select id="rusVersions" value={selectedRusVersion} onChange={handleRusVersionsChange}>
                     {rusVersions.map(version => (
-                        <option key={version}>{version}</option>
+                        <option key={version} value={version}>{version}</option>
                     ))}
                 </select>
             </div>

@@ -8,14 +8,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     const [books, setBooks] = useState([]);
     const [chaptersAmount, setChaptersAmount] = useState(0);
     const [versesAmount, setVersesAmount] = useState(0);
-
     const [verses, setVerses] = useState([]);
-
-    const [selectedVersion, setSelectedVersion] = useState(null);
-    const [selectedBook, setSelectedBook] = useState(null);
+    const [selectedVersion, setSelectedVersion] = useState('');
+    const [selectedBook, setSelectedBook] = useState('');
     const [selectedBookIndex, setSelectedBookIndex] = useState(3);
     const [selectedVerseIndex, setSelectedVerseIndex] = useState(0);
-    const [selectedChapter, setSelectedChapter] = useState(null);
+    const [selectedChapter, setSelectedChapter] = useState(1);
     const [selectedVerse, setSelectedVerse] = useState(null);
     const [selectedTill, setSelectedTill] = useState(null);
 
@@ -32,7 +30,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
             });
-    }, []);
+    }, [language]);
 
     const handleLanguageChange = (e) => {
         const selectedLanguage = e.target.value;
@@ -49,9 +47,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleBookChange = (e) => {
-        setSelectedBookIndex(books.indexOf(e.target.value.toLowerCase()) + 1);
-        setBookToDisplay(e.target.value);
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=0&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+        const bookName = e.target.value;
+        const bookIndex = books.indexOf(bookName) + 1;
+        setSelectedBook(bookName);
+        setSelectedBookIndex(bookIndex);
+        setBookToDisplay(bookName);
+        axios.get(`https://holybible.ge/service.php?w=${bookIndex}&t=0&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
                 setChaptersAmount(data.tavi[0].cc);
@@ -63,8 +64,9 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleChapterChange = (e) => {
-        setSelectedChapter(e.target.value);
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${e.target.value}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+        const chapter = e.target.value;
+        setSelectedChapter(chapter);
+        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
                 if (data.bibleData) {
@@ -80,23 +82,22 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleVerseChange = (e) => {
-        const selectedVerseIndex = parseInt(parseInt(e.target.value) - 1);
-        setSelectedVerse(selectedVerseIndex);
-        setSelectedVerseIndex(selectedVerseIndex);
+        const verseIndex = parseInt(e.target.value) - 1;
+        setSelectedVerse(verseIndex);
+        setSelectedVerseIndex(verseIndex);
 
-        if (verses && verses.length > selectedVerseIndex) {
-            const selectedVerseData = verses[selectedVerseIndex];
+        if (verses && verses.length > verseIndex) {
+            const selectedVerseData = {
+                book: selectedBook,
+                bookIndex: selectedBookIndex,
+                chapter: parseInt(selectedChapter),
+                verse: parseInt(verseIndex + 1),
+                till: null,
+                bv: [verses[verseIndex]]
+            }
 
             if (selectedTill === null) {
-                setVersesToDisplay([selectedVerseData]);
-            } else {
-                const versesToDisplay = [];
-                for (let i = selectedVerseIndex; i < selectedTill - 1; i++) {
-                    if (verses[i]) {
-                        versesToDisplay.push(verses[i]);
-                    }
-                }
-                setVersesToDisplay(versesToDisplay);
+                setVersesToDisplay(selectedVerseData);
             }
         } else {
             console.error('Selected verse index is out of bounds or verses is undefined');
@@ -104,15 +105,20 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleTillChange = (e) => {
-        setSelectedTill(parseInt(e.target.value));
+        const tillVerseIndex = parseInt(e.target.value) - 1;
+        setSelectedTill(tillVerseIndex);
 
-        const versesToDisplay = [];
-                for (let i = selectedVerseIndex; i <= parseInt(e.target.value) - 1; i++) {
-                    if (verses[i]) {
-                        versesToDisplay.push(verses[i]);
-                    }
-                }
-                setVersesToDisplay(versesToDisplay);
+        const versesToDisplayArray = verses.slice(selectedVerseIndex, tillVerseIndex + 1);
+        console.log(selectedBookIndex);
+        const versesToDisplay = {
+            book: selectedBook,
+            bookIndex: selectedBookIndex,
+            chapter: parseInt(selectedChapter),
+            verse: parseInt(selectedVerse + 1),
+            till: parseInt(tillVerseIndex + 1),
+            bv: versesToDisplayArray
+        };
+        setVersesToDisplay(versesToDisplay);
     }
 
     return (
@@ -122,27 +128,27 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 <option value="eng">ENG</option>
                 <option value="russian">RUS</option>
             </select>
-            <select id="versions" onChange={(e) => setSelectedVersion(e.target.value)}>
+            <select id="versions" value={selectedVersion} onChange={(e) => setSelectedVersion(e.target.value)}>
                 {versions.map(version => (
                     <option key={version} value={version}>{version}</option>
                 ))}
             </select>
-            <select id="books" onChange={handleBookChange}>
+            <select id="books" value={selectedBook} onChange={handleBookChange}>
                 {books.map(book => (
                     <option key={book} value={book}>{book}</option>
                 ))}
             </select>
-            <select id="chapters" onChange={handleChapterChange}>
+            <select id="chapters" value={selectedChapter} onChange={handleChapterChange}>
                 {Array.from({ length: chaptersAmount }, (_, i) => (
                     <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
             </select>
-            <select id="verses" onChange={handleVerseChange}>
+            <select id="verses" value={selectedVerse + 1} onChange={handleVerseChange}>
                 {Array.from({ length: versesAmount }, (_, i) => (
                     <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
             </select>
-            <select id="till" onChange={handleTillChange}>
+            <select id="till" value={selectedTill + 1} onChange={handleTillChange}>
                 {Array.from({ length: versesAmount }, (_, i) => (
                     <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
