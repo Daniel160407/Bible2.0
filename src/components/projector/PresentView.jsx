@@ -10,12 +10,17 @@ const PresentView = () => {
     useEffect(() => {
         channel.onmessage = event => {
             const data = event.data;
-            if (!data.versesToDisplay) {
-                setFontSize(data.fontSize);
+
+            if(data.background) {
+                document.body.style.backgroundImage = `url(${data.background})`;
             } else {
-                setVersesToDisplay(data.versesToDisplay || []);
-                setShow(data.show);
-                setFontSize(data.fontSize);
+                if (!data.versesToDisplay) {
+                    setFontSize(data.fontSize);
+                } else {
+                    setVersesToDisplay(data.versesToDisplay || []);
+                    setShow(data.show);
+                    setFontSize(data.fontSize);
+                }
             }
         };
     }, []);

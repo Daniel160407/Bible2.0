@@ -7,28 +7,63 @@
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
-  padding: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
   background-color: #1a2538;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  transition: height 0.3s ease;
+
+  &.hidden {
+    height: -50px;
+    padding-top: 0;
+    gap: 0;
+  }
+
+  #hide {
+    display: flex;
+    justify-content: flex-end;
+
+    #hideButton {
+      width: 20px;
+      cursor: pointer;
+    }
+  }
 
   .btns {
     display: flex;
     gap: 1rem;
+    transition: opacity 0.3s ease, max-height 0.5s ease;
+    max-height: 300px;
+    opacity: 1;
+    overflow: hidden;
+    padding: 15px;
+
+    &.hidden {
+      display: none;
+      max-height: 0;
+      opacity: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      gap: 0;
+    }
   }
 
   .madeBy {
     color: #f4f4f4;
     text-align: center;
-    
+
     a {
-        color: #f4f4f4;
-        text-decoration: underline;
-        padding: 0px;
+      color: #f4f4f4;
+      text-decoration: underline;
+      padding: 0px;
     }
   }
 
-  .documentationBtn, .bibleBtn {
+  .documentationBtn,
+  .bibleBtn {
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     color: #ffffff;
@@ -102,16 +137,16 @@
 .button-85:before {
   content: "";
   background: linear-gradient(
-                  45deg,
-                  #ff0000,
-                  #ff7300,
-                  #fffb00,
-                  #48ff00,
-                  #00ffd5,
-                  #002bff,
-                  #7a00ff,
-                  #ff00c8,
-                  #ff0000
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
   );
   position: absolute;
   top: -2px;

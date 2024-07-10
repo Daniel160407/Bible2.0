@@ -1,25 +1,31 @@
-import React from 'react';
-import Documentation from '../Documentation';
-import Bible from '../Bible';
-import PresentView from '../projector/PresentView';
+import React, { useState } from 'react';
 import '../../style/Buttons.scss';
 
 const Buttons = () => {
+    const [isHidden, setIsHidden] = useState(false);
+
+    const toggleHidden = () => {
+        setIsHidden(!isHidden);
+    };
+
     const onDocumentationClick = () => {
         window.open('/documentation', '_blank');
-    }
+    };
 
     const onBibleClick = () => {
         window.open('/bible', '_blank');
-    }
+    };
 
     const onOpenPresentViewClick = () => {
         window.open('/presentview', '_blank');
-    }
+    };
 
     return (
-        <div className="windowButtons">
-            <div className='btns'>
+        <div className={`windowButtons`}>
+            <div id='hide' className={`${isHidden ? 'hidden' : ''}`} onClick={toggleHidden}>
+                <img id='hideButton' src='/images/hide.jpeg' alt="Hide"></img>
+            </div>
+            <div className={`btns ${isHidden ? 'hidden' : ''}`}>
                 <button onClick={onDocumentationClick} className='documentationBtn'>Documentation</button>
                 <button onClick={onBibleClick} className='bibleBtn'>Bible</button>
                 <button onClick={onOpenPresentViewClick} className="button-85" role="button">Open Present View</button>

@@ -1,0 +1,62 @@
+// styles/BackgroundController.scss
+
+$background-color: #172131;
+$input-border-color: #444;
+$input-focus-color: #66afe9;
+$image-border-color: #333;
+$image-hover-border-color: #66afe9;
+$text-color: #e0e0e0;
+
+.background-controller {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, auto);
+  gap: 1rem;
+  padding: 2rem;
+  margin-bottom: 10rem;
+  background-color: $background-color;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+
+  .background-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background-color: #374151;
+    border: 1px solid $input-border-color;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+    color: $text-color;
+
+    &:hover {
+      border-color: $input-focus-color;
+    }
+
+    input[type="radio"] {
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      border: 1px solid $input-border-color;
+      border-radius: 50%;
+      transition: border-color 0.3s;
+      transform: scale(1.5);
+
+      &:focus {
+        border-color: $input-focus-color;
+        outline: none;
+      }
+    }
+
+    img {
+      max-width: 80px; // Adjusted size
+      max-height: 80px; // Adjusted size
+      border: 1px solid $image-border-color;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+
+      &:hover {
+        border-color: $image-hover-border-color;
+      }
+    }
+  }
+}

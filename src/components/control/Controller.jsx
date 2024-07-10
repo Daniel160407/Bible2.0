@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Buttons from "./Buttons";
 import ProjectorController from "../projector/ProjectorController";
 import axios from "axios";
+import BackgroundController from "./BackgroundController";
 
 const Controller = ({ versesToDisplay, booksToDisplay }) => {
     const [show, setShow] = useState(false);
@@ -16,6 +17,8 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
     const [geoBooks, setGeoBooks] = useState([]);
     const [engBooks, setEngBooks] = useState([]);
     const [rusBooks, setRusBooks] = useState([]);
+
+    const [background, setBackground] = useState('/backgrounds/16.jpeg');
 
     useEffect(() => {
         axios.get('https://holybible.ge/service.php?w=&t=&m=&s=&mv=&language=geo&page=1')
@@ -40,6 +43,13 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
             show: true
         });
     }, [fontSize]);
+
+    useEffect(() => {
+        console.log(background)
+        channel.postMessage({
+            background: background
+        });
+    }, [background]);
     
     useEffect(() => {
         if (show) {
@@ -152,7 +162,10 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
 
     return (
         <>
-            <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize}/>
+            <div id="control">
+                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize}/>
+                <BackgroundController setBackground={setBackground}/>
+            </div>
             <Buttons/>
         </>
     );

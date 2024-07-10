@@ -1,7 +1,7 @@
 #control {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
     padding: 2rem;
     padding-left: 4em;
@@ -9,8 +9,19 @@
     background-color: #172131;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  
-    .buttons {
+
+    #projectorController {
+      display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 2rem;
+    padding-left: 4em;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+
+      .buttons {
         display: flex;
         gap: 10px;
 
@@ -89,5 +100,8 @@
       gap: 0.5rem;
       width: 100%;
     }
+    }
+  
+    
   }
   

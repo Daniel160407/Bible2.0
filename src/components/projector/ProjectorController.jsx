@@ -89,7 +89,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     };
 
     return (
-        <div id="control">
+        <div id="projectorController">
             <div className="buttons">
                 <button onClick={() => {
                     setShow(true);
