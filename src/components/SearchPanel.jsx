@@ -16,6 +16,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     const [selectedChapter, setSelectedChapter] = useState(1);
     const [selectedVerse, setSelectedVerse] = useState(null);
     const [selectedTill, setSelectedTill] = useState(null);
+    const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
@@ -121,6 +122,85 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
         setVersesToDisplay(versesToDisplay);
     }
 
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            const pattern = /(\d?\D+?) (\d+):(\d+)(?:-(\d+))?/;
+            const matcher = searchText.match(pattern);
+
+            let bookindex;
+    
+            if (matcher) {
+                const searchedBook = matcher[1].trim();
+                let bookFound = false;
+    
+                for (let i = 0; i < books.length; i++) {
+                    if (books[i].toLowerCase().startsWith(searchedBook.toLowerCase())) {
+                        setSelectedBook(books[i]);
+                        bookindex = i + 1;
+                        setBookToDisplay(books[i]);
+                        bookFound = true;
+                        break;
+                    }
+                }
+    
+                if (bookFound) {
+                    const searchedChapter = parseInt(matcher[2], 10);
+                    setSelectedChapter(searchedChapter);
+    
+                    const searchedVerse = parseInt(matcher[3], 10);
+                    setSelectedVerse(searchedVerse - 1);
+                    setSelectedVerseIndex(searchedVerse - 1);
+    
+                    const searchedTill = matcher[4] ? parseInt(matcher[4], 10) : null;
+                    setSelectedTill(searchedTill ? searchedTill - 1 : null);
+
+                    axios.get(`https://holybible.ge/service.php?w=${bookindex}&t=${searchedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+                        .then(response => {
+                            const data = response.data;
+                            if (data.bibleData) {
+                                setVerses(data.bibleData);
+                                const versesToDisplayArray = data.bibleData.slice(searchedVerse - 1, searchedTill ? searchedTill : searchedVerse);
+    
+                                const versesToDisplay = {
+                                    book: books[bookindex - 1],
+                                    bookIndex: bookindex,
+                                    chapter: searchedChapter,
+                                    verse: searchedVerse,
+                                    till: searchedTill,
+                                    bv: versesToDisplayArray
+                                };
+                                setVersesToDisplay(versesToDisplay);
+                            } else {
+                                console.error('Bible data is not available in the response');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("There was an error fetching the chapters!", error);
+                        });
+                } else {
+                    console.error('Book not found');
+                }
+            } else {
+                console.log(e.target.value);
+                axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=&m=&s=${e.target.value}&mv=${selectedVersion}&language=${language}&page=1`)
+                    .then(response => {
+                        const data = response.data;
+
+                        const versesToDisplay = {
+                            book: books[selectedBookIndex - 1],
+                            bookindex: selectedBookIndex - 1,
+                            chapter: null,
+                            verse: null,
+                            till: null,
+                            bv: data.bibleData
+                        }
+                        setVersesToDisplay(versesToDisplay);
+                    });
+            }
+        }
+    }
+    
+
     return (
         <div id="searchPanel">
             <select id="language" value={language} onChange={handleLanguageChange}>
@@ -153,6 +233,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                     <option key={i + 1} value={i + 1}>{i + 1}</option>
                 ))}
             </select>
+            <input id="search" type="text" placeholder="Search" value={searchText} onKeyPress={handleKeyPress} onChange={(e) => setSearchText(e.target.value)}></input>
         </div>
     );
 }

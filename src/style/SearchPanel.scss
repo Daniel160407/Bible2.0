@@ -37,5 +37,25 @@ $select-padding: 0.5rem;
     padding: $select-padding;
 }
 }
+input {
+  background-color: $select-bg;
+  border: 1px solid $select-border;
+  color: $select-color;
+  padding: $select-padding;
+  font-size: 1rem;
+  line-height: 1.5;
+  cursor: text;
+  outline: none;
+  border-radius: 10px;
+
+  &:hover,
+  &:focus {
+    border-color: #007bff;
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+}
 
 }
