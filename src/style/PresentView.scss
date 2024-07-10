@@ -1,7 +1,13 @@
 // PresentView.scss
+
+html {
+    scroll-behavior: smooth;
+}
+
 #verses {
     padding-right: 50px;
     padding-left: 50px;
+    scroll-behavior: smooth;
 }
 
 .verse {

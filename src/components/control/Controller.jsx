@@ -11,6 +11,8 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
     const [languages, setLanguages] = useState({});
     const [versions, setVersions] = useState({});
 
+    const [fontSize, setFontSize] = useState(7);
+
     const [geoBooks, setGeoBooks] = useState([]);
     const [engBooks, setEngBooks] = useState([]);
     const [rusBooks, setRusBooks] = useState([]);
@@ -31,6 +33,13 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
                 setRusBooks(response.data.bibleNames);
             });
     }, []);
+
+    useEffect(() => {
+        channel.postMessage({
+            fontSize: fontSize,
+            show: true
+        });
+    }, [fontSize]);
     
     useEffect(() => {
         if (show) {
@@ -63,6 +72,7 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
                         console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
+                            fontSize: fontSize,
                             show: show
                         });
                         setShow(false);
@@ -93,6 +103,7 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
                         console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
+                            fontSize: fontSize,
                             show: show
                         });
                         setShow(false);
@@ -123,6 +134,7 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
                         console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
+                            fontSize: fontSize,
                             show: show
                         });
                         setShow(false);
@@ -140,7 +152,7 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
 
     return (
         <>
-            <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages}/>
+            <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize}/>
             <Buttons/>
         </>
     );
