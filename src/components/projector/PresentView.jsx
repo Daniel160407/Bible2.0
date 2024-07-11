@@ -14,12 +14,16 @@ const PresentView = () => {
             if(data.background) {
                 document.body.style.backgroundImage = `url(${data.background})`;
             } else {
-                if (!data.versesToDisplay) {
-                    setFontSize(data.fontSize);
+                if(data.show === false) {
+                    setShow(false);
                 } else {
-                    setVersesToDisplay(data.versesToDisplay || []);
-                    setShow(data.show);
-                    setFontSize(data.fontSize);
+                    if (!data.versesToDisplay) {
+                        setFontSize(data.fontSize);
+                    } else {
+                        setVersesToDisplay(data.versesToDisplay || []);
+                        setShow(data.show);
+                        setFontSize(data.fontSize);
+                    }
                 }
             }
         };

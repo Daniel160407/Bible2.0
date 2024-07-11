@@ -45,7 +45,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     }, [fontSize]);
 
     useEffect(() => {
-        console.log(background);
         channel.postMessage({
             background: background
         });
@@ -54,11 +53,8 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     useEffect(() => {
         if (show) {
             const verses = {};
-            console.log(languages);
 
             if (languages.geo) {
-                console.log(versesToDisplay.bookIndex);
-                console.log(versesToDisplay.chapter);
                 axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.geo}&language=geo&page=1`)
                     .then(response => {
                         let bv = [];
@@ -66,7 +62,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                         if (!separatedVerse) {
                             if (versesToDisplay.till !== null) {
                                 for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
-                                    console.log(response.data.bibleData[i]);
                                     bv.push(response.data.bibleData[i]);
                                 }
                             } else {
@@ -83,9 +78,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
                         } else {
                             const bibleData = response.data.bibleData;
-                            console.log(bibleData);
                             for (let i = 0; i < bibleData.length; i++) {
-                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
                                 if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
                                     bv.push(bibleData[i]);
                                 }
@@ -100,8 +93,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                             };
                         }
 
-                        console.log(bv);
-                        console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
                             fontSize: fontSize,
@@ -112,8 +103,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
             }
 
             if (languages.eng) {
-                console.log(versesToDisplay.bookIndex);
-                console.log(versesToDisplay.chapter);
                 axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.eng}&language=eng&page=1`)
                     .then(response => {
                         let bv = [];
@@ -121,7 +110,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                         if (!separatedVerse) {
                             if (versesToDisplay.till !== null) {
                                 for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
-                                    console.log(response.data.bibleData[i]);
                                     bv.push(response.data.bibleData[i]);
                                 }
                             } else {
@@ -138,9 +126,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
                         } else {
                             const bibleData = response.data.bibleData;
-                            console.log(bibleData);
                             for (let i = 0; i < bibleData.length; i++) {
-                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
                                 if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
                                     bv.push(bibleData[i]);
                                 }
@@ -155,8 +141,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                             };
                         }
 
-                        console.log(bv);
-                        console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
                             fontSize: fontSize,
@@ -167,8 +151,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
             }
 
             if (languages.rus) {
-                console.log(versesToDisplay.bookIndex);
-                console.log(versesToDisplay.chapter);
                 axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.rus}&language=russian&page=1`)
                     .then(response => {
                         let bv = [];
@@ -176,7 +158,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                         if (!separatedVerse) {
                             if (versesToDisplay.till !== null) {
                                 for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
-                                    console.log(response.data.bibleData[i]);
                                     bv.push(response.data.bibleData[i]);
                                 }
                             } else {
@@ -193,9 +174,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
                         } else {
                             const bibleData = response.data.bibleData;
-                            console.log(bibleData);
                             for (let i = 0; i < bibleData.length; i++) {
-                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
                                 if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
                                     bv.push(bibleData[i]);
                                 }
@@ -210,8 +189,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                             };
                         }
 
-                        console.log(bv);
-                        console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
                             fontSize: fontSize,
@@ -225,7 +202,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
     useEffect(() => {
         if (clear) {
-            channel.postMessage({ clear: clear });
+            channel.postMessage({ show: show });
             setClear(false);
         }
     }, [clear]);

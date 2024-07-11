@@ -24,6 +24,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 const data = response.data;
                 setVersions(data.versions);
                 setBooks(data.bibleNames);
+                setChaptersAmount(data.tavi[0].cc);
+                setVersesAmount(data.muxli[0].cc);
 
                 setSelectedBook(data.bibleNames[3]);
                 setSelectedVersion(data.versions[0]);
@@ -48,6 +50,10 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleBookChange = (e) => {
+        setSelectedChapter('');
+        setSelectedVerse('');
+        setSelectedTill('');
+
         const bookName = e.target.value;
         const bookIndex = books.indexOf(bookName) + 1;
         setSelectedBook(bookName);
@@ -65,6 +71,9 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleChapterChange = (e) => {
+        setSelectedVerse('');
+        setSelectedTill('');
+
         const chapter = e.target.value;
         setSelectedChapter(chapter);
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
@@ -83,6 +92,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleVerseChange = (e) => {
+        setSelectedTill('');
+        
         const verseIndex = parseInt(e.target.value) - 1;
         setSelectedVerse(verseIndex);
         setSelectedVerseIndex(verseIndex);
@@ -110,7 +121,6 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
         setSelectedTill(tillVerseIndex);
 
         const versesToDisplayArray = verses.slice(selectedVerseIndex, tillVerseIndex + 1);
-        console.log(selectedBookIndex);
         const versesToDisplay = {
             book: selectedBook,
             bookIndex: selectedBookIndex,
@@ -181,7 +191,6 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                     console.error('Book not found');
                 }
             } else {
-                console.log(e.target.value);
                 axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=&m=&s=${e.target.value}&mv=${selectedVersion}&language=${language}&page=1`)
                     .then(response => {
                         const data = response.data;

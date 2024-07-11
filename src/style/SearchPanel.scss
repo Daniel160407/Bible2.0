@@ -5,57 +5,74 @@ $select-focus-outline: 2px solid #007bff;
 $select-padding: 0.5rem;
 
 #searchPanel {
-    display: flex;
-    gap: 10px;
-
-    select {
-  appearance: none;
-  background-color: $select-bg;
-  border: $select-border;
-  color: $select-color;
-  padding: $select-padding;
-  font-size: 1rem;
-  line-height: 1.5;
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px;
+  background-color: #1f2937;
   border-radius: 10px;
 
-  &:hover,
-  &:focus {
-    border-color: #007bff;
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  }
-  option {
-    padding: 10px;
-    border-radius: 10px;
+  select {
+    appearance: none;
     background-color: $select-bg;
+    border: $select-border;
     color: $select-color;
     padding: $select-padding;
-}
-}
-input {
-  background-color: $select-bg;
-  border: 1px solid $select-border;
-  color: $select-color;
-  padding: $select-padding;
-  font-size: 1rem;
-  line-height: 1.5;
-  cursor: text;
-  outline: none;
-  border-radius: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-radius: 5px;
 
-  &:hover,
-  &:focus {
-    border-color: #007bff;
+    &:hover,
+    &:focus {
+      border-color: #007bff;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    &#chapters, &#verses, &#till {
+      width: 60px;
+    }
+
+    option {
+      background-color: $select-bg;
+      color: $select-color;
+      padding: 0.5rem;
+      margin: 2px;
+      border-radius: 5px;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        background-color: darken($select-bg, 10%);
+      }
+    }
   }
 
-  &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  }
-}
+  input {
+    background-color: $select-bg;
+    border: $select-border;
+    color: $select-color;
+    padding: $select-padding;
+    font-size: 1rem;
+    line-height: 1.5;
+    cursor: text;
+    outline: none;
+    border-radius: 5px;
 
+    &:hover,
+    &:focus {
+      border-color: #007bff;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+
+  }
 }

@@ -67,7 +67,6 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     };
 
     const handleGeoCheckboxChange = (e) => {
-        console.log(e.target.checked);
         setLanguages(prevLanguages => ({
             ...prevLanguages,
             geo: e.target.checked

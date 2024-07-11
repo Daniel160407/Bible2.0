@@ -2,10 +2,6 @@ import React from 'react';
 import '../../style/BackgroundController.scss';
 
 const BackgroundController = ({ setBackground }) => {
-    const handleBackgroundChange = (e) => {
-        
-    };
-
     const elements = [];
     for (let i = 1; i <= 20; i++) {
         elements.push(
