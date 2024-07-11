@@ -89,6 +89,10 @@
         outline: none;
       }
     }
+
+    #textColor option {
+      font-weight: bold;
+    }
   
     .button-container {
       display: flex;

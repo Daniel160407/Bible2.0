@@ -10,12 +10,13 @@ const PresentView = () => {
     useEffect(() => {
         channel.onmessage = event => {
             const data = event.data;
-            console.log(data.font);
 
             if(data.background) {
                 document.body.style.backgroundImage = `url(${data.background})`;
             } else if(data.font) {
                 document.body.style.fontFamily = data.font;
+            } else if(data.textColor){
+                document.body.style.color = data.textColor;
             } else {
                 if(data.show === false) {
                     setShow(false);

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import '../../style/ProjectorController.scss';
 
-const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize, setFont, font }) => {
+const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize, setFont, font, setTextColor, textColor }) => {
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
@@ -12,21 +12,23 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     const [selectedRusVersion, setSelectedRusVersion] = useState('Синодальный перевод');
 
     useEffect(() => {
-        axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=geo&page=1')
-            .then(response => {
-                setGeoVersions(response.data.versions);
-            });
+        const fetchVersions = async () => {
+            try {
+                const geoResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=geo&page=1');
+                setGeoVersions(geoResponse.data.versions);
 
-        axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=eng&page=1')
-            .then(response => {
-                setEngVersions(response.data.versions);
-            });
-        
-        axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=russian&page=1')
-            .then(response => {
-                setRusVersions(response.data.versions);
-            });
-        
+                const engResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=eng&page=1');
+                setEngVersions(engResponse.data.versions);
+
+                const rusResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=russian&page=1');
+                setRusVersions(rusResponse.data.versions);
+            } catch (error) {
+                console.error("Error fetching versions: ", error);
+            }
+        };
+
+        fetchVersions();
+
         const versions = {
             geo: selectedGeoVersion,
             eng: selectedEngVersion,
@@ -34,35 +36,35 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
         }
 
         setVersions(versions);
-    }, []);
+    }, [selectedGeoVersion, selectedEngVersion, selectedRusVersion, setVersions]);
 
     const handleGeoVersionsChange = (e) => {
         if (document.getElementById('georgian').checked) {
+            setSelectedGeoVersion(e.target.value);
             setVersions(prevVersions => ({
                 ...prevVersions,
                 geo: e.target.value
             }));
-            setSelectedGeoVersion(e.target.value);
         }
     };
 
     const handleEngVersionsChange = (e) => {
         if (document.getElementById('english').checked) {
+            setSelectedEngVersion(e.target.value);
             setVersions(prevVersions => ({
                 ...prevVersions,
                 eng: e.target.value
             }));
-            setSelectedEngVersion(e.target.value);
         }
     };
 
     const handleRusVersionsChange = (e) => {
         if (document.getElementById('russian').checked) {
+            setSelectedRusVersion(e.target.value);
             setVersions(prevVersions => ({
                 ...prevVersions,
                 rus: e.target.value
             }));
-            setSelectedRusVersion(e.target.value);
         }
     };
 
@@ -102,24 +104,35 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
             <div className="selection">
                 <label htmlFor="font-size">Font Size:</label>
                 <select id="font-size" value={fontSize} onChange={(e) => setFontSize(e.target.value)}>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                    <option>6</option>
-                    <option>7</option>
-                    <option>8</option>
-                    <option>9</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
                 </select>
             </div>
             <div className="selection">
                 <label htmlFor="fonts">Fonts:</label>
                 <select id="fonts" value={font} onChange={(e) => setFont(e.target.value)}>
-                    <option>Banner</option>
-                    <option>Valera</option>
-                    <option>Mouldy</option>
-                    <option>Oswald</option>
+                    <option value="Banner">Banner</option>
+                    <option value="Valera">Valera</option>
+                    <option value="Mouldy">Mouldy</option>
+                    <option value="Oswald">Oswald</option>
+                </select>
+            </div>
+            <div className="selection">
+                <label htmlFor="textColor">Text Color</label>
+                <select id="textColor" value={textColor} onChange={(e) => setTextColor(e.target.value)}>
+                    <option style={{color: '#f4f4f4'}} value='#f4f4f4'>White</option>
+                    <option style={{color: '#000000'}} value='#000000'>Black</option>
+                    <option style={{color: '#2196f3'}} value='#2196f3'>Blue</option>
+                    <option style={{color: '#edc612'}} value='#edc612'>Yellow</option>
+                    <option style={{color: '#31a24c'}} value='#31a24c'>Green</option>
+                    <option style={{color: '#ea1f36'}} value='#ea1f36'>Red</option>
                 </select>
             </div>
             <div className="selection">

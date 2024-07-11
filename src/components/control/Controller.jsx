@@ -14,6 +14,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
     const [fontSize, setFontSize] = useState(7);
     const [font, setFont] = useState('Banner');
+    const [textColor, setTextColor] = useState('white');
 
     const [geoBooks, setGeoBooks] = useState([]);
     const [engBooks, setEngBooks] = useState([]);
@@ -50,6 +51,12 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
             show: true
         });
     }, [fontSize]);
+
+    useEffect(() => {
+        channel.postMessage({
+            textColor: textColor
+        });
+    }, [textColor]);
 
     useEffect(() => {
         channel.postMessage({
@@ -217,7 +224,9 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     return (
         <>
             <div id="control">
-                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize} setFont={setFont} font={font} />
+                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} 
+                    setLanguages={setLanguages} setFontSize={setFontSize} 
+                    fontSize={fontSize} setFont={setFont} font={font} setTextColor={setTextColor} textColor={textColor} />
                 <BackgroundController setBackground={setBackground} />
             </div>
             <Buttons />

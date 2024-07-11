@@ -8,7 +8,7 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
     const [separatedVerse, setSeparatedVerse] = useState(null);
 
     useEffect(() => {
-        if(showSeparatedVerse){
+        if (showSeparatedVerse) {
             setShowSeparatedVerse(false);
         }
     }, [versesToDisplay]);
@@ -22,30 +22,36 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
     return (
         <div className="verses">
             {!showSeparatedVerse ? (
-                versesToDisplay.chapter && versesToDisplay.bv.length > 0 ? (
-                    versesToDisplay.bv.map((verse, index) => (
-                        <div key={index} className="verse">
-                            <h1 className="verse-text">{verse.bv}</h1>
-                            <h1 className="verse-reference">
-                                {versesToDisplay.book} {versesToDisplay.chapter}:{versesToDisplay.verse + index}
-                            </h1>
-                        </div>
-                    ))
-                ) : (
-                    versesToDisplay.bv.map((verse, index) => (
-                        <div key={index} className="verse">
-                            <h1 
-                                className="verse-text" 
-                                dangerouslySetInnerHTML={{ __html: verse.bv }}
-                            ></h1>
-                            <h1 className="verse-reference">
-                                {versesToDisplay.book} {verse.tavi}:{verse.muxli}
-                            </h1>
-                            <div className="separateDiv">
-                                <button className="separateButton" onClick={() => handleSeparate(verse)}>Separate</button>
+                versesToDisplay && versesToDisplay.bv.length > 0 ? (
+                    versesToDisplay.chapter ? (
+                        versesToDisplay.bv.map((verse, index) => (
+                            <div key={index} className="verse">
+                                <h1 className="verse-text">{verse.bv}</h1>
+                                <h1 className="verse-reference">
+                                    {versesToDisplay.book} {versesToDisplay.chapter}:{versesToDisplay.verse + index}
+                                </h1>
                             </div>
-                        </div>
-                    ))
+                        ))
+                    ) : (
+                        versesToDisplay.bv.map((verse, index) => (
+                            <div key={index} className="verse">
+                                <h1 
+                                    className="verse-text" 
+                                    dangerouslySetInnerHTML={{ __html: verse.bv }}
+                                ></h1>
+                                <h1 className="verse-reference">
+                                    {versesToDisplay.book} {verse.tavi}:{verse.muxli}
+                                </h1>
+                                <div className="separateDiv">
+                                    <button className="separateButton" onClick={() => handleSeparate(verse)}>Separate</button>
+                                </div>
+                            </div>
+                        ))
+                    )
+                ) : (
+                    <div className="verse">
+                        <h1 className="verse-text">No Verses to Display</h1>
+                    </div>
                 )
             ) : (
                 <div className="verse">
@@ -67,7 +73,8 @@ Verses.propTypes = {
         book: PropTypes.string.isRequired,
         chapter: PropTypes.number,
         verse: PropTypes.number
-    }).isRequired
+    }).isRequired,
+    setSeparatedProjectorVerse: PropTypes.func.isRequired
 };
 
 export default Verses;
