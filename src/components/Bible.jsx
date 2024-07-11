@@ -1,7 +1,9 @@
+import '../style/Bible.scss';
+
 const Bible = () => {
     return (
         <div>
-            <h1>Needs to be finished!</h1>
+            <h1>Coming Soon!</h1>
         </div>
     );
 }

@@ -13,6 +13,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     const [versions, setVersions] = useState({});
 
     const [fontSize, setFontSize] = useState(7);
+    const [font, setFont] = useState('Banner');
 
     const [geoBooks, setGeoBooks] = useState([]);
     const [engBooks, setEngBooks] = useState([]);
@@ -36,6 +37,12 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
                 setRusBooks(response.data.bibleNames);
             });
     }, []);
+
+    useEffect(() => {
+        channel.postMessage({
+            font: font
+        });
+    }, [font]);
 
     useEffect(() => {
         channel.postMessage({
@@ -210,7 +217,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     return (
         <>
             <div id="control">
-                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize} />
+                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize} setFont={setFont} font={font} />
                 <BackgroundController setBackground={setBackground} />
             </div>
             <Buttons />

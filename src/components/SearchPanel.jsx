@@ -29,6 +29,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
 
                 setSelectedBook(data.bibleNames[3]);
                 setSelectedVersion(data.versions[0]);
+
+                axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=ახალი გადამუშავებული გამოცემა 2015&language=${language}&page=1`)
+                    .then(response => {
+                        setVerses(response.data.bibleData);
+                        setSelectedChapter(1);
+                    });
             })
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
@@ -51,8 +57,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
 
     const handleBookChange = (e) => {
         setSelectedChapter('');
-        setSelectedVerse('');
-        setSelectedTill('');
+        setSelectedVerse(null);
+        setSelectedTill(null);
 
         const bookName = e.target.value;
         const bookIndex = books.indexOf(bookName) + 1;
@@ -71,8 +77,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleChapterChange = (e) => {
-        setSelectedVerse('');
-        setSelectedTill('');
+        setSelectedVerse(null);
+        setSelectedTill(null);
 
         const chapter = e.target.value;
         setSelectedChapter(chapter);
@@ -92,8 +98,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleVerseChange = (e) => {
-        setSelectedTill('');
-        
+        setSelectedTill(null);
+
         const verseIndex = parseInt(e.target.value) - 1;
         setSelectedVerse(verseIndex);
         setSelectedVerseIndex(verseIndex);
@@ -108,9 +114,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 bv: [verses[verseIndex]]
             }
 
-            if (selectedTill === null) {
-                setVersesToDisplay(selectedVerseData);
-            }
+            setVersesToDisplay(selectedVerseData);
         } else {
             console.error('Selected verse index is out of bounds or verses is undefined');
         }

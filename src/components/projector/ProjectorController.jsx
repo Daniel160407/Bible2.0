@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import '../../style/ProjectorController.scss';
 
-const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize }) => {
+const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize, setFont, font }) => {
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
@@ -111,6 +111,15 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                     <option>7</option>
                     <option>8</option>
                     <option>9</option>
+                </select>
+            </div>
+            <div className="selection">
+                <label htmlFor="fonts">Fonts:</label>
+                <select id="fonts" value={font} onChange={(e) => setFont(e.target.value)}>
+                    <option>Banner</option>
+                    <option>Valera</option>
+                    <option>Mouldy</option>
+                    <option>Oswald</option>
                 </select>
             </div>
             <div className="selection">

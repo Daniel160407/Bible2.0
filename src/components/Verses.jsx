@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import '../style/Verses.scss';
+import '../style/Fonts.scss';
 import { useEffect, useState } from 'react';
 
 const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
@@ -14,7 +15,7 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
 
     const handleSeparate = (verse) => {
         setSeparatedVerse(verse);
-        setSeparatedProjectorVerse(verse)
+        setSeparatedProjectorVerse(verse);
         setShowSeparatedVerse(true);
     };
 
