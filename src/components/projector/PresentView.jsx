@@ -8,6 +8,9 @@ const PresentView = () => {
     const channel = new BroadcastChannel('projectorData');
 
     useEffect(() => {
+        document.body.style.color = '#f4f4f4';
+        document.body.style.backgroundImage = 'url(/backgrounds/16.jpeg)';
+
         channel.onmessage = event => {
             const data = event.data;
 
