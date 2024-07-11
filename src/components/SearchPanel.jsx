@@ -28,6 +28,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 setVersesAmount(data.muxli[0].cc);
 
                 setSelectedBook(data.bibleNames[3]);
+                setSelectedBookIndex(4);
                 setSelectedVersion(data.versions[0]);
 
                 axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=ახალი გადამუშავებული გამოცემა 2015&language=${language}&page=1`)
