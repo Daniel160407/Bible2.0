@@ -188,7 +188,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
 
                         const versesToDisplay = {
                             book: books[selectedBookIndex - 1],
-                            bookindex: selectedBookIndex - 1,
+                            bookIndex: selectedBookIndex - 1,
                             chapter: null,
                             verse: null,
                             till: null,

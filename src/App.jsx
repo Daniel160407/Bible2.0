@@ -6,12 +6,13 @@ import Controller from './components/control/Controller';
 const App = () => {
   const [versesToDisplay, setVersesToDisplay] = useState({ bv: [], book: '', verse: 0, chapter: 0 });
   const [bookToDisplay, setBookToDisplay] = useState('');
-  
+  const [separatedVerse, setSeparatedVerse] = useState(null);
+
   return (
     <>
       <SearchPanel setVersesToDisplay={setVersesToDisplay} setBookToDisplay={setBookToDisplay}/>
-      <Verses versesToDisplay={versesToDisplay}/>
-      <Controller versesToDisplay={versesToDisplay} bookToDisplay={bookToDisplay}/>
+      <Verses versesToDisplay={versesToDisplay} setSeparatedProjectorVerse={setSeparatedVerse}/>
+      <Controller versesToDisplay={versesToDisplay} separatedVerse={separatedVerse}/>
     </>
   )
 }

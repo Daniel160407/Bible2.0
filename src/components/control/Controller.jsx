@@ -4,7 +4,7 @@ import ProjectorController from "../projector/ProjectorController";
 import axios from "axios";
 import BackgroundController from "./BackgroundController";
 
-const Controller = ({ versesToDisplay, booksToDisplay }) => {
+const Controller = ({ versesToDisplay, separatedVerse }) => {
     const [show, setShow] = useState(false);
     const [clear, setClear] = useState(false);
     const channel = new BroadcastChannel('projectorData');
@@ -45,71 +45,62 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
     }, [fontSize]);
 
     useEffect(() => {
-        console.log(background)
+        console.log(background);
         channel.postMessage({
             background: background
         });
     }, [background]);
-    
+
     useEffect(() => {
         if (show) {
             const verses = {};
             console.log(languages);
-            if(languages.geo){
+
+            if (languages.geo) {
                 console.log(versesToDisplay.bookIndex);
-                axios.get(`https://holybible.ge/service.php?w=${versesToDisplay.bookIndex}&t=${versesToDisplay.chapter}&m=&s=&mv=${versions.geo}&language=geo&page=1`)
+                console.log(versesToDisplay.chapter);
+                axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.geo}&language=geo&page=1`)
                     .then(response => {
                         let bv = [];
-                        if(versesToDisplay.till !== null) {
-                            for(let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++){
-                                console.log(response.data.bibleData[i]);
-                                bv.push(response.data.bibleData[i]);
+
+                        if (!separatedVerse) {
+                            if (versesToDisplay.till !== null) {
+                                for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
+                                    console.log(response.data.bibleData[i]);
+                                    bv.push(response.data.bibleData[i]);
+                                }
+                            } else {
+                                bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
                             }
+
+                            verses.geo = {
+                                book: geoBooks[versesToDisplay.bookIndex - 1],
+                                chapter: versesToDisplay.chapter,
+                                verse: versesToDisplay.verse,
+                                till: versesToDisplay.till,
+                                bv: bv
+                            };
+
                         } else {
-                            bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
+                            const bibleData = response.data.bibleData;
+                            console.log(bibleData);
+                            for (let i = 0; i < bibleData.length; i++) {
+                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
+                                if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
+                                    bv.push(bibleData[i]);
+                                }
+                            }
+
+                            verses.geo = {
+                                book: geoBooks[versesToDisplay.bookIndex],
+                                chapter: separatedVerse.tavi,
+                                verse: separatedVerse.muxli,
+                                till: null,
+                                bv: bv
+                            };
                         }
-                        
+
                         console.log(bv);
-
-                        verses.geo = {
-                            book: geoBooks[versesToDisplay.bookIndex - 1],
-                            chapter: versesToDisplay.chapter,
-                            verse: versesToDisplay.verse,
-                            till: versesToDisplay.till,
-                            bv: bv
-                        }
-
-                        console.log(verses);
-                        channel.postMessage({
-                            versesToDisplay: verses,
-                            fontSize: fontSize,
-                            show: show
-                        });
-                        setShow(false);
-                    });
-            } 
-            if(languages.eng){
-                axios.get(`https://holybible.ge/service.php?w=${versesToDisplay.bookIndex}&t=${versesToDisplay.chapter}&m=&s=&mv=${versions.eng}&language=eng&page=1`)
-                    .then(response => {
-                        let bv = [];
-                        if(versesToDisplay.till !== null) {
-                            for(let i = versesToDisplay.verse - 1; i <= versesToDisplay.till; i++){
-                                bv.push(response.data.bibleData[i]);
-                            }
-                        } else {
-                            bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
-                        }
-
-                        console.log(engBooks);
-                        
-                        verses.eng = {
-                            book: engBooks[versesToDisplay.bookIndex - 1],
-                            chapter: versesToDisplay.chapter,
-                            verse: versesToDisplay.verse,
-                            till: versesToDisplay.till,
-                            bv: bv
-                        }
-
                         console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
@@ -119,28 +110,107 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
                         setShow(false);
                     });
             }
-            if(languages.rus){
-                axios.get(`https://holybible.ge/service.php?w=${versesToDisplay.bookIndex}&t=${versesToDisplay.chapter}&m=&s=&mv=${versions.rus}&language=russian&page=1`)
+
+            if (languages.eng) {
+                console.log(versesToDisplay.bookIndex);
+                console.log(versesToDisplay.chapter);
+                axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.eng}&language=eng&page=1`)
                     .then(response => {
                         let bv = [];
-                        if(versesToDisplay.till !== null) {
-                            for(let i = versesToDisplay.verse - 1; i <= versesToDisplay.till; i++){
-                                bv.push(response.data.bibleData[i]);
+
+                        if (!separatedVerse) {
+                            if (versesToDisplay.till !== null) {
+                                for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
+                                    console.log(response.data.bibleData[i]);
+                                    bv.push(response.data.bibleData[i]);
+                                }
+                            } else {
+                                bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
                             }
+
+                            verses.eng = {
+                                book: engBooks[versesToDisplay.bookIndex - 1],
+                                chapter: versesToDisplay.chapter,
+                                verse: versesToDisplay.verse,
+                                till: versesToDisplay.till,
+                                bv: bv
+                            };
+
                         } else {
-                            bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
+                            const bibleData = response.data.bibleData;
+                            console.log(bibleData);
+                            for (let i = 0; i < bibleData.length; i++) {
+                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
+                                if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
+                                    bv.push(bibleData[i]);
+                                }
+                            }
+
+                            verses.eng = {
+                                book: engBooks[versesToDisplay.bookIndex],
+                                chapter: separatedVerse.tavi,
+                                verse: separatedVerse.muxli,
+                                till: null,
+                                bv: bv
+                            };
                         }
 
-                        console.log(engBooks);
-                        
-                        verses.rus = {
-                            book: rusBooks[versesToDisplay.bookIndex - 1],
-                            chapter: versesToDisplay.chapter,
-                            verse: versesToDisplay.verse,
-                            till: versesToDisplay.till,
-                            bv: bv
+                        console.log(bv);
+                        console.log(verses);
+                        channel.postMessage({
+                            versesToDisplay: verses,
+                            fontSize: fontSize,
+                            show: show
+                        });
+                        setShow(false);
+                    });
+            }
+
+            if (languages.rus) {
+                console.log(versesToDisplay.bookIndex);
+                console.log(versesToDisplay.chapter);
+                axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${versions.rus}&language=russian&page=1`)
+                    .then(response => {
+                        let bv = [];
+
+                        if (!separatedVerse) {
+                            if (versesToDisplay.till !== null) {
+                                for (let i = versesToDisplay.verse - 1; i <= versesToDisplay.till - 1; i++) {
+                                    console.log(response.data.bibleData[i]);
+                                    bv.push(response.data.bibleData[i]);
+                                }
+                            } else {
+                                bv.push(response.data.bibleData[versesToDisplay.verse - 1]);
+                            }
+
+                            verses.rus = {
+                                book: rusBooks[versesToDisplay.bookIndex - 1],
+                                chapter: versesToDisplay.chapter,
+                                verse: versesToDisplay.verse,
+                                till: versesToDisplay.till,
+                                bv: bv
+                            };
+
+                        } else {
+                            const bibleData = response.data.bibleData;
+                            console.log(bibleData);
+                            for (let i = 0; i < bibleData.length; i++) {
+                                console.log(bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli);
+                                if (bibleData[i].tavi === separatedVerse.tavi && bibleData[i].muxli === separatedVerse.muxli) {
+                                    bv.push(bibleData[i]);
+                                }
+                            }
+
+                            verses.rus = {
+                                book: rusBooks[versesToDisplay.bookIndex],
+                                chapter: separatedVerse.tavi,
+                                verse: separatedVerse.muxli,
+                                till: null,
+                                bv: bv
+                            };
                         }
 
+                        console.log(bv);
                         console.log(verses);
                         channel.postMessage({
                             versesToDisplay: verses,
@@ -154,7 +224,7 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
     }, [show]);
 
     useEffect(() => {
-        if(clear){
+        if (clear) {
             channel.postMessage({ clear: clear });
             setClear(false);
         }
@@ -163,10 +233,10 @@ const Controller = ({ versesToDisplay, booksToDisplay }) => {
     return (
         <>
             <div id="control">
-                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize}/>
-                <BackgroundController setBackground={setBackground}/>
+                <ProjectorController setShow={setShow} setClear={setClear} setVersions={setVersions} setLanguages={setLanguages} setFontSize={setFontSize} fontSize={fontSize} />
+                <BackgroundController setBackground={setBackground} />
             </div>
-            <Buttons/>
+            <Buttons />
         </>
     );
 }
