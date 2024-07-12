@@ -15,6 +15,7 @@ $text-color: #e0e0e0;
   background-color: $background-color;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  color: $text-color;
 
   .background-item {
     display: flex;
@@ -25,7 +26,6 @@ $text-color: #e0e0e0;
     border: 1px solid $input-border-color;
     border-radius: 8px;
     transition: border-color 0.3s;
-    color: $text-color;
 
     &:hover {
       border-color: $input-focus-color;
@@ -46,14 +46,60 @@ $text-color: #e0e0e0;
     }
 
     img {
-      max-width: 80px; // Adjusted size
-      max-height: 80px; // Adjusted size
+      max-width: 80px;
+      max-height: 80px;
       border: 1px solid $image-border-color;
       border-radius: 8px;
       transition: border-color 0.3s;
 
       &:hover {
         border-color: $image-hover-border-color;
+      }
+    }
+  }
+
+  .specific-background {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background-color: #374151;
+    border: 1px solid $input-border-color;
+    border-radius: 8px;
+    grid-column: span 5;
+    transition: border-color 0.3s;
+
+    &:hover {
+      border-color: $input-focus-color;
+    }
+
+    input[type="radio"] {
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      border: 1px solid $input-border-color;
+      border-radius: 50%;
+      transition: border-color 0.3s;
+      transform: scale(1.5);
+
+      &:focus {
+        border-color: $input-focus-color;
+        outline: none;
+      }
+    }
+
+    input[type="text"], input[type="file"] {
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      width: 100%;
+      background-color: #2c3e50;
+      border: 1px solid $input-border-color;
+      border-radius: 4px;
+      color: $text-color;
+      transition: border-color 0.3s;
+
+      &:focus {
+        border-color: $input-focus-color;
+        outline: none;
       }
     }
   }
