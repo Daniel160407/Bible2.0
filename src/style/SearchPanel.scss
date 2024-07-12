@@ -72,7 +72,21 @@ $select-padding: 0.5rem;
     &:focus {
       box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
+  }
 
-
+  #clearButton {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: #dc3545;
+  
+    &:hover {
+      background-color: #c82333;
+      box-shadow: 0 4px 8px rgba(25, 48, 182, 0.5);
+    }
   }
 }

@@ -214,6 +214,17 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
         }
     }
     
+    const onClearButtonClick = () => {
+        const versesToDisplay = {
+            book: null,
+            chapter: null,
+            verse: null,
+            till: null,
+            bv: null
+        }
+
+        setVersesToDisplay(versesToDisplay);
+    }
 
     return (
         <div id="searchPanel">
@@ -248,6 +259,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 ))}
             </select>
             <input id="search" type="text" placeholder="Search" value={searchText} onKeyPress={handleKeyPress} onChange={(e) => setSearchText(e.target.value)}></input>
+            <button id="clearButton" onClick={onClearButtonClick}>Clear</button>
         </div>
     );
 }

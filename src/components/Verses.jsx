@@ -22,7 +22,7 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
     return (
         <div className="verses">
             {!showSeparatedVerse ? (
-                versesToDisplay && versesToDisplay.bv.length > 0 ? (
+                versesToDisplay && versesToDisplay.bv && versesToDisplay.bv.length > 0 ? (
                     versesToDisplay.chapter ? (
                         versesToDisplay.bv.map((verse, index) => (
                             <div key={index} className="verse">
@@ -68,9 +68,9 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
 Verses.propTypes = {
     versesToDisplay: PropTypes.shape({
         bv: PropTypes.arrayOf(PropTypes.shape({
-            bv: PropTypes.string.isRequired,
-        })).isRequired,
-        book: PropTypes.string.isRequired,
+            bv: PropTypes.string,
+        })),
+        book: PropTypes.string,
         chapter: PropTypes.number,
         verse: PropTypes.number
     }).isRequired,

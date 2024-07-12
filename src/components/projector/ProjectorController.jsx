@@ -125,7 +125,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                 </select>
             </div>
             <div className="selection">
-                <label htmlFor="textColor">Text Color</label>
+                <label htmlFor="textColor">Text Color:</label>
                 <select id="textColor" value={textColor} onChange={(e) => setTextColor(e.target.value)}>
                     <option style={{color: '#f4f4f4'}} value='#f4f4f4'>White</option>
                     <option style={{color: '#000000'}} value='#000000'>Black</option>
