@@ -29,6 +29,16 @@ const Documentation = () => {
                     <p>დაბლა, პანელში დაინახავ ღილაკს "Open Present View" დააჭირე და გადაგიყვანს ახალ ტაბზე. ეს გვერდი უნდა აჩვენო პროექტორზე. იმისათვის რომ ბრაუზერის ზედა მხარე არ გამოჩნდეს თუ ვინდოუსზე ხარ დააჭირე F11-ს ან დაბლითა მარჯვენა კუთხეში აქვს გადიდების იკონი.</p>
                     <br/>
                     <p>იმისთვის რომ სასურველი ტექსტი სასურველ ენაზე გამოჩნეს დაბრუნდი ისევ მთავარ გვერდზე, უნდა აირჩიო ენა და შესაბამისი ვერსიები და show ღილაკს დააწექი. ასევე შეგიძლია აკონტროლო ფონტის ზომა, ფერი და ფონტი.</p>
+                    <img src='/examples/example3.jpeg' alt='Example'></img>
+                    <p>ამ განყოფილებაში კი ირჩევთ სასურველ ბექგრაუნდს</p>
+                    <img src='/examples/example4.jpeg' alt='Example'></img>
+                    <p>დამატებით შენიშვნებისთვის / იდეებისთვის მომწერეთ მესენჯერზე / ტელეგრამზე</p>
+                    <p>ვიდეო ინსტრუქციისთვის შეგიძლიათ გადახვიდეთ YouTube ბმულზე</p>
+                    <div className='contact'>
+                        <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
+                        <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
+                        <a href='https://youtu.be/D4BGCJaUspk' target='_blank'><p>YouTube</p></a>
+                    </div>
                 </div>
             )}
             {language === 'eng' && (
@@ -49,6 +59,14 @@ const Documentation = () => {
                     <p>In the bottom panel, you will see a button "Open Present View". Click it and it will take you to a new tab. This page should be shown on the projector. To hide the browser's top bar, if you are on Windows, press F11 or use the maximize icon in the bottom right corner.</p>
                     <br/>
                     <p>To show the desired text in the desired language, go back to the main page, select the language and corresponding versions, and press the show button. You can also control the font size, color and font.</p>
+                    <img src='/examples/example3.jpeg' alt='Example'></img>
+                    <p>In this section you choose the desired background</p>
+                    <img src='/examples/example4.jpeg' alt='Example'></img>
+                    <p>For additional notes / ideas, write to me on Messenger / Telegram</p>
+                    <div className='contact'>
+                        <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
+                        <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
+                    </div>
                 </div>
             )}
             {language === 'rus' && (
@@ -69,6 +87,14 @@ const Documentation = () => {
                     <p>Внизу, в панеле вы увидите кнопку "Open Present View". Нажмите на нее, и она откроется в новой вкладке. Эта страница должна быть показана на проекторе. Чтобы скрыть верхнюю панель браузера, если вы на Windows, нажмите F11 или используйте значок увеличения в правом нижнем углу.</p>
                     <br/>
                     <p>Чтобы показать нужный текст на нужном языке, вернитесь на главную страницу, выберите язык и соответствующие версии, и нажмите кнопку show. Вы также можете контролировать размер шрифта, цвет и фонт.</p>
+                    <img src='/examples/example3.jpeg' alt='Example'></img>
+                    <p>В этом разделе вы выбираете желаемый фон</p>
+                    <img src='/examples/example4.jpeg' alt='Example'></img>
+                    <p>Для дополнительных замечаний/идей пишите мне в Messenger/Telegram.</p>
+                    <div className='contact'>
+                        <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
+                        <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
+                    </div>
                 </div>
             )}
         </div>
