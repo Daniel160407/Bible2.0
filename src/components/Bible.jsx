@@ -29,6 +29,18 @@ const Bible = () => {
                 }
                 setChapters(chapterArray);
             });
+
+            axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+            .then(response => {
+                const data = response.data;
+                const chapterArray = [];
+                for(let i = 1; i <= data.tavi[0].cc; i++){
+                    chapterArray.push(i);
+                }
+                setChapters(chapterArray);
+                setSelectedChapter(1);
+                setVerses(data.bibleData);
+            });
     }, [language]);
 
     const handleBookChange = (e) => {
