@@ -37,7 +37,7 @@ const Documentation = () => {
                     <div className='contact'>
                         <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
                         <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
-                        <a href='https://youtu.be/D4BGCJaUspk' target='_blank'><p>YouTube</p></a>
+                        <a href='https://youtu.be/3O34v4cyKt4' target='_blank'><p>YouTube</p></a>
                     </div>
                 </div>
             )}
@@ -63,9 +63,11 @@ const Documentation = () => {
                     <p>In this section you choose the desired background</p>
                     <img src='/examples/example4.jpeg' alt='Example'></img>
                     <p>For additional notes / ideas, write to me on Messenger / Telegram</p>
+                    <p>You can go to YouTube link for video instruction</p>
                     <div className='contact'>
                         <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
                         <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
+                        <a href='https://youtu.be/m0mi9xZS9Hs' target='_blank'><p>YouTube</p></a>
                     </div>
                 </div>
             )}
@@ -91,9 +93,11 @@ const Documentation = () => {
                     <p>В этом разделе вы выбираете желаемый фон</p>
                     <img src='/examples/example4.jpeg' alt='Example'></img>
                     <p>Для дополнительных замечаний/идей пишите мне в Messenger/Telegram.</p>
+                    <p>Вы можете перейти по ссылке на YouTube для просмотра видеоинструкций</p>
                     <div className='contact'>
                         <a href='https://www.facebook.com/daniel.abulashvili.5' target='_blank'><p>Messenger</p></a>
                         <a href='https://t.me/Daniel170407' target='_blank'><p>Telegram</p></a>
+                        <a href='https://youtu.be/McG8s4D3aH8' target='_blank'><p>YouTube</p></a>
                     </div>
                 </div>
             )}
