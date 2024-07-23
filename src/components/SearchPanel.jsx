@@ -109,7 +109,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
             const selectedVerseData = {
                 book: selectedBook,
                 bookIndex: selectedBookIndex,
-                chapter: parseInt(selectedChapter),
+                chapter: parseInt(selectedChapter) || 1,
                 verse: parseInt(verseIndex + 1),
                 till: null,
                 bv: [verses[verseIndex]]

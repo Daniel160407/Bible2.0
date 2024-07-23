@@ -17,7 +17,10 @@ const Buttons = () => {
     };
 
     const onOpenPresentViewClick = () => {
-        window.open('/presentview', '_blank');
+        const newWindow = window.open('/presentview', '_blank');
+        newWindow.onload = () => {
+            newWindow.document.documentElement.requestFullscreen();
+        };
     };
 
     return (
