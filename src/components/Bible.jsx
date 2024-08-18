@@ -107,7 +107,26 @@ const Bible = () => {
                 verseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
-    }    
+    }
+    
+    const handleNextButtonClick = () => {
+        const chapter = selectedChapter + 1;
+        setSelectedChapter(chapter);
+
+        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+            .then(response => {
+                const data = response.data;
+                if (data.bibleData) {
+                    setVerses(data.bibleData);
+                    console.log(data.bibleData);
+                } else {
+                    console.error('Bible data is not available in the response');
+                }
+            })
+            .catch(error => {
+                console.error("There was an error fetching the chapters!", error);
+            });
+    }
 
     return (
         <div id='bible'>
@@ -146,6 +165,9 @@ const Bible = () => {
                         <h1 className='verse-reference'>{selectedBook} {verse.tavi}:{verse.muxli}</h1>
                     </div>
                 ))}
+            </div>
+            <div className='controlls'>
+                <button onClick={handleNextButtonClick}>Next Chapter</button>
             </div>
         </div>
     );
