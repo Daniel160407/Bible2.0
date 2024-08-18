@@ -103,6 +103,11 @@ const Bible = () => {
                 const data = response.data;
                 if (data.bibleData) {
                     setVerses(data.bibleData);
+                    const verseArray = [];
+                    for(let i = 1; i <= data.muxli[0].cc; i++){
+                        verseArray.push(i);
+                    }
+                    setVersesAmount(verseArray);
                 } else {
                     console.error('Bible data is not available in the response');
                 }
