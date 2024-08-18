@@ -24,6 +24,7 @@ const Bible = () => {
                 const data = response.data;
                 setVersions(data.versions);
                 setBooks(data.bibleNames);
+                setSelectedBook(data.bibleNames[3]);
 
                 const chapterArray = [];
                 for(let i = 1; i <= data.tavi[0].cc; i++){
@@ -49,6 +50,27 @@ const Bible = () => {
                 setVerses(data.bibleData);
             });
     }, [language]);
+
+    const handleVersionChange = (e) => {
+        setSelectedVersion(e.target.value);
+
+        axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${e.target.value}&language=${language}&page=1`)
+        .then(response => {
+            const data = response.data;
+            const chapterArray = [];
+            for(let i = 1; i <= data.tavi[0].cc; i++){
+                chapterArray.push(i);
+            }
+            const verseArray = [];
+            for(let i = 1; i <= data.muxli[0].cc; i++){
+                verseArray.push(i);
+            }
+            setChapters(chapterArray);
+            setVersesAmount(verseArray);
+            setSelectedChapter(1);
+            setVerses(data.bibleData);
+        });
+    }
 
     const handleBookChange = (e) => {
         const book = e.target.value;
@@ -81,7 +103,6 @@ const Bible = () => {
                 const data = response.data;
                 if (data.bibleData) {
                     setVerses(data.bibleData);
-                    console.log(data.bibleData);
                 } else {
                     console.error('Bible data is not available in the response');
                 }
@@ -118,7 +139,6 @@ const Bible = () => {
                 const data = response.data;
                 if (data.bibleData) {
                     setVerses(data.bibleData);
-                    console.log(data.bibleData);
                 } else {
                     console.error('Bible data is not available in the response');
                 }
@@ -136,7 +156,7 @@ const Bible = () => {
                     <option value={'eng'}>ENG</option>
                     <option value={'russian'}>RUS</option>
                 </select>
-                <select value={selectedVersion} onChange={(e) => setSelectedVersion(e.target.value)}>
+                <select value={selectedVersion} onChange={handleVersionChange}>
                     {versions.map(version => (
                         <option value={version} key={version}>{version}</option>
                     ))}
