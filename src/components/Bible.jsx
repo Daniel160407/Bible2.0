@@ -136,7 +136,7 @@ const Bible = () => {
     }
     
     const handleNextButtonClick = () => {
-        const chapter = selectedChapter + 1;
+        const chapter = parseInt(selectedChapter) + 1;
         setSelectedChapter(chapter);
 
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
