@@ -14,38 +14,63 @@ const PresentView = () => {
         channel.onmessage = event => {
             const data = event.data;
 
-            if(data.background) {
+            if (data.background) {
                 document.body.style.backgroundImage = `url(${data.background})`;
-            } else if(data.font) {
+            } else if (data.font) {
                 document.body.style.fontFamily = data.font;
-            } else if(data.textColor){
+            } else if (data.textColor) {
                 document.body.style.color = data.textColor;
             } else {
-                if(data.show === false) {
+                if (data.show === false) {
                     setShow(false);
                 } else {
                     if (!data.versesToDisplay) {
-                        setFontSize(data.fontSize);
+                        if (data.fontSize === true) {
+                            adjustFontSize();
+                        } else {
+                            setFontSize(data.fontSize);
+                        }
                     } else {
                         setVersesToDisplay(data.versesToDisplay || []);
                         setShow(data.show);
-                        setFontSize(data.fontSize);
+
+                        if (data.fontSize === true) {
+                            adjustFontSize();
+                        } else {
+                            setFontSize(data.fontSize);
+                        }
                     }
                 }
             }
         };
     }, []);
 
+    const adjustFontSize = () => {
+        const versesDiv = document.getElementById('verses');
+        for (let i = 0; i < 200; i+=10) {
+            versesDiv.style.fontSize = `${i}px`;
+            if (versesDiv.offsetHeight > window.innerHeight) {
+                console.log(versesDiv.offsetHeight);
+                console.log(window.innerHeight);
+                console.log(versesDiv.offsetHeight > window.innerHeight);
+                console.log(i);
+
+                setFontSize(i);
+                break;
+            }
+        }
+    };
+
     useEffect(() => {
         if (fontSize !== null) {
             const verses = document.getElementsByClassName('verse-text');
             Array.from(verses).forEach(verse => {
-                verse.style.fontSize = `${fontSize * 10}px`;
+                verse.style.fontSize = `${fontSize}px`;
             });
 
             const references = document.getElementsByClassName('verse-reference');
             Array.from(references).forEach(reference => {
-                reference.style.fontSize = `${fontSize * 10}px`;
+                reference.style.fontSize = `${fontSize}px`;
             });
         }
     }, [versesToDisplay, fontSize]);

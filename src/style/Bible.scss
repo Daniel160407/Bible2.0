@@ -7,6 +7,7 @@
         display: flex;
         align-items: center;
         margin-bottom: 20px;
+        flex-wrap: wrap;
 
         select {
             background-color: #3d4f5e;
@@ -32,6 +33,23 @@
             option {
                 background-color: #2a3b4c;
                 color: #ffffff;
+            }
+        }
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: stretch;
+
+            select {
+                width: 100%;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            select {
+                font-size: 12px;
+                padding: 8px;
             }
         }
     }
@@ -64,6 +82,28 @@
             .verse-reference {
                 font-size: 16px;
                 color: #b2b2b2;
+            }
+
+            @media (max-width: 768px) {
+                .verse-text {
+                    font-size: 16px;
+                }
+
+                .verse-reference {
+                    font-size: 14px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                padding: 10px;
+
+                .verse-text {
+                    font-size: 14px;
+                }
+
+                .verse-reference {
+                    font-size: 12px;
+                }
             }
         }
     }
