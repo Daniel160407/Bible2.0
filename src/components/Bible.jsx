@@ -15,6 +15,7 @@ const Bible = () => {
     const [selectedBookIndex, setSelectedBookIndex] = useState(3);
     const [selectedChapter, setSelectedChapter] = useState(1);
     const [selectedVerse, setSelectedVerse] = useState(0);
+    const [searchText, setSearchText] = useState('');
 
     const [verses, setVerses] = useState([]);
 
@@ -153,6 +154,27 @@ const Bible = () => {
             });
     }
 
+    const handleSearchAction = (e) => {
+        if(e.key === 'Enter' && searchText.trim() !== ''){
+            const searchPromises = books.slice(3).map((book, index) => {
+                return axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`);
+            });
+    
+            Promise.all(searchPromises)
+                .then(results => {
+                    const allVerses = results.flatMap(result => result.data.bibleData || []);
+                    allVerses.forEach(verse => {
+                        verse.searched = true;
+                    });
+                    setVerses(allVerses);
+                    console.log(allVerses);
+                })
+                .catch(error => {
+                    console.error("There was an error fetching the search results!", error);
+                });
+        }
+    }
+
     return (
         <div id='bible'>
             <div className='searchPanel'>
@@ -181,13 +203,23 @@ const Bible = () => {
                         <option value={verse} key={verse}>{verse}</option>
                     ))}
                 </select>
+                <input
+                    type='text'
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    onKeyPress={handleSearchAction}
+                    placeholder="Search verses..."
+                />
             </div>
             <div id='content'>
                 <h1 id='title'>{selectedBook}</h1>
                 {verses.map(verse => (
                     <div id={`verse${verse.id}`} key={verse.id} className='verse'>
-                        <h1 className='verse-text'>{verse.bv}</h1>
-                        <h1 className='verse-reference'>{selectedBook} {verse.tavi}:{verse.muxli}</h1>
+                        <h1
+                            className='verse-text'
+                            dangerouslySetInnerHTML={{ __html: verse.bv }}
+                        />
+                        <h1 className='verse-reference'>{verse.searched ? books[parseInt(verse.wigni) + 2] : selectedBook} {verse.tavi}:{verse.muxli}</h1>
                     </div>
                 ))}
             </div>
