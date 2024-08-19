@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../style/Bible.scss';
-import { useEffect } from 'react';
 import axios from 'axios';
 
 const Bible = () => {
@@ -18,7 +17,9 @@ const Bible = () => {
     const [searchText, setSearchText] = useState('');
 
     const [verses, setVerses] = useState([]);
+    const [results, setResults] = useState(0);
 
+    // Fetch initial versions and books
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
             .then(response => {
@@ -27,139 +28,77 @@ const Bible = () => {
                 setBooks(data.bibleNames);
                 setSelectedBook(data.bibleNames[3]);
 
-                const chapterArray = [];
-                for(let i = 1; i <= data.tavi[0].cc; i++){
-                    chapterArray.push(i);
-                }
+                const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
-            });
+            })
+            .catch(error => console.error("Error fetching versions and books:", error));
+    }, [language]);
 
-            axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+    // Fetch chapters and verses when version changes
+    useEffect(() => {
+        axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
-                const chapterArray = [];
-                for(let i = 1; i <= data.tavi[0].cc; i++){
-                    chapterArray.push(i);
-                }
-                const verseArray = [];
-                for(let i = 1; i <= data.muxli[0].cc; i++){
-                    verseArray.push(i);
-                }
+                const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
+                const verseArray = Array.from({ length: data.muxli[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
                 setVersesAmount(verseArray);
                 setSelectedChapter(1);
                 setVerses(data.bibleData);
-            });
-    }, [language]);
+            })
+            .catch(error => console.error("Error fetching version data:", error));
+    }, [selectedVersion, language]);
 
-    const handleVersionChange = (e) => {
-        setSelectedVersion(e.target.value);
-
-        axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${e.target.value}&language=${language}&page=1`)
-        .then(response => {
-            const data = response.data;
-            const chapterArray = [];
-            for(let i = 1; i <= data.tavi[0].cc; i++){
-                chapterArray.push(i);
-            }
-            const verseArray = [];
-            for(let i = 1; i <= data.muxli[0].cc; i++){
-                verseArray.push(i);
-            }
-            setChapters(chapterArray);
-            setVersesAmount(verseArray);
-            setSelectedChapter(1);
-            setVerses(data.bibleData);
-        });
-    }
-
-    const handleBookChange = (e) => {
-        const book = e.target.value;
-        setSelectedBook(book);
-        setSelectedBookIndex(books.indexOf(book) + 1);
-        setVerses([]);
-
-        axios.get(`https://holybible.ge/service.php?w=${books.indexOf(book) + 1}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+    // Fetch data when book changes
+    useEffect(() => {
+        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
-                const chapterArray = [];
-                for(let i = 1; i <= data.tavi[0].cc; i++){
-                    chapterArray.push(i);
-                }
+                const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
                 setSelectedChapter(1);
                 setVerses(data.bibleData);
             })
-            .catch(error => {
-                console.error("There was an error fetching the versions!", error);
-            });
-    }
+            .catch(error => console.error("Error fetching book data:", error));
+    }, [selectedBook, selectedBookIndex, selectedVersion, language]);
 
-    const handleChapterChange = (e) => {
-        const chapter = e.target.value;
-        setSelectedChapter(chapter);
-
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+    // Fetch verses when chapter changes
+    useEffect(() => {
+        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${selectedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
                 if (data.bibleData) {
                     setVerses(data.bibleData);
-                    const verseArray = [];
-                    for(let i = 1; i <= data.muxli[0].cc; i++){
-                        verseArray.push(i);
-                    }
+                    const verseArray = Array.from({ length: data.muxli[0].cc }, (_, i) => i + 1);
                     setVersesAmount(verseArray);
                 } else {
                     console.error('Bible data is not available in the response');
                 }
             })
-            .catch(error => {
-                console.error("There was an error fetching the chapters!", error);
-            });
-    }
+            .catch(error => console.error("Error fetching chapter data:", error));
+    }, [selectedChapter, selectedBookIndex, selectedVersion, language]);
 
-    const handleVerseChange = (e) => {
-        const verse = e.target.value;
-        setSelectedVerse(verse);
-    
-        for(let i = 0; i < verses.length; i++){
-            if(verses[i].muxli == verse){
-                for(let i = 0; i < verses.length; i++){
-                    document.getElementById(`verse${verses[i].id}`).style.backgroundColor = "#2b3648";
-                }
-    
-                const verseDiv = document.getElementById(`verse${verses[i].id}`);
-                verseDiv.style.backgroundColor = "#4a4a6a";
-    
-                verseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
-    }
+    const handleVersionChange = (e) => setSelectedVersion(e.target.value);
+    const handleBookChange = (e) => {
+        const book = e.target.value;
+        setSelectedBook(book);
+        setSelectedBookIndex(books.indexOf(book) + 1);
+        setVerses([]);
+    };
+    const handleChapterChange = (e) => setSelectedChapter(e.target.value);
+    const handleVerseChange = (e) => setSelectedVerse(e.target.value);
     
     const handleNextButtonClick = () => {
-        const chapter = parseInt(selectedChapter) + 1;
-        setSelectedChapter(chapter);
-
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
-            .then(response => {
-                const data = response.data;
-                if (data.bibleData) {
-                    setVerses(data.bibleData);
-                } else {
-                    console.error('Bible data is not available in the response');
-                }
-            })
-            .catch(error => {
-                console.error("There was an error fetching the chapters!", error);
-            });
-    }
+        const nextChapter = parseInt(selectedChapter) + 1;
+        setSelectedChapter(nextChapter);
+    };
 
     const handleSearchAction = (e) => {
         if(e.key === 'Enter' && searchText.trim() !== ''){
-            const searchPromises = books.slice(3).map((book, index) => {
-                return axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`);
-            });
-    
+            const searchPromises = books.slice(3).map((book, index) => 
+                axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`)
+            );
+
             Promise.all(searchPromises)
                 .then(results => {
                     const allVerses = results.flatMap(result => result.data.bibleData || []);
@@ -167,13 +106,11 @@ const Bible = () => {
                         verse.searched = true;
                     });
                     setVerses(allVerses);
-                    console.log(allVerses);
+                    setResults(allVerses.length);
                 })
-                .catch(error => {
-                    console.error("There was an error fetching the search results!", error);
-                });
+                .catch(error => console.error("Error fetching search results:", error));
         }
-    }
+    };
 
     return (
         <div id='bible'>
@@ -213,12 +150,12 @@ const Bible = () => {
             </div>
             <div id='content'>
                 <h1 id='title'>{selectedBook}</h1>
+                {verses.some(v => v.searched) && (
+                    <p>{results} Results found</p>
+                )}
                 {verses.map(verse => (
-                    <div id={`verse${verse.id}`} key={verse.id} className='verse'>
-                        <h1
-                            className='verse-text'
-                            dangerouslySetInnerHTML={{ __html: verse.bv }}
-                        />
+                    <div id={`verse${verse.id}`} key={verse.id} className={`verse ${verse.searched ? 'searched' : ''}`}>
+                        <h1 className='verse-text' dangerouslySetInnerHTML={{ __html: verse.bv }} />
                         <h1 className='verse-reference'>{verse.searched ? books[parseInt(verse.wigni) + 2] : selectedBook} {verse.tavi}:{verse.muxli}</h1>
                     </div>
                 ))}
@@ -228,6 +165,6 @@ const Bible = () => {
             </div>
         </div>
     );
-}
+};
 
 export default Bible;
