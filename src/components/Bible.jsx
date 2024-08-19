@@ -19,7 +19,6 @@ const Bible = () => {
     const [verses, setVerses] = useState([]);
     const [results, setResults] = useState(0);
 
-    // Fetch initial versions and books
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
             .then(response => {
@@ -34,7 +33,6 @@ const Bible = () => {
             .catch(error => console.error("Error fetching versions and books:", error));
     }, [language]);
 
-    // Fetch chapters and verses when version changes
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
@@ -49,7 +47,6 @@ const Bible = () => {
             .catch(error => console.error("Error fetching version data:", error));
     }, [selectedVersion, language]);
 
-    // Fetch data when book changes
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
@@ -62,7 +59,6 @@ const Bible = () => {
             .catch(error => console.error("Error fetching book data:", error));
     }, [selectedBook, selectedBookIndex, selectedVersion, language]);
 
-    // Fetch verses when chapter changes
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${selectedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
@@ -86,7 +82,23 @@ const Bible = () => {
         setVerses([]);
     };
     const handleChapterChange = (e) => setSelectedChapter(e.target.value);
-    const handleVerseChange = (e) => setSelectedVerse(e.target.value);
+    const handleVerseChange = (e) => {
+        const verse = e.target.value;
+        setSelectedVerse(verse);
+    
+        for(let i = 0; i < verses.length; i++){
+            if(verses[i].muxli == verse){
+                for(let i = 0; i < verses.length; i++){
+                    document.getElementById(`verse${verses[i].id}`).style.backgroundColor = "#2b3648";
+                }
+    
+                const verseDiv = document.getElementById(`verse${verses[i].id}`);
+                verseDiv.style.backgroundColor = "#4a4a6a";
+    
+                verseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
     
     const handleNextButtonClick = () => {
         const nextChapter = parseInt(selectedChapter) + 1;
