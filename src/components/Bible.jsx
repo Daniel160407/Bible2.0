@@ -8,18 +8,18 @@ const Bible = () => {
     const [books, setBooks] = useState([]);
     const [chapters, setChapters] = useState([]);
     const [versesAmount, setVersesAmount] = useState([]);
-
     const [selectedVersion, setSelectedVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
     const [selectedBook, setSelectedBook] = useState('დაბადება');
     const [selectedBookIndex, setSelectedBookIndex] = useState(3);
     const [selectedChapter, setSelectedChapter] = useState(1);
     const [selectedVerse, setSelectedVerse] = useState(0);
     const [searchText, setSearchText] = useState('');
-
     const [verses, setVerses] = useState([]);
     const [results, setResults] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
@@ -30,10 +30,12 @@ const Bible = () => {
                 const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
             })
-            .catch(error => console.error("Error fetching versions and books:", error));
+            .catch(error => console.error("Error fetching versions and books:", error))
+            .finally(() => setLoading(false));
     }, [language]);
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
@@ -44,10 +46,12 @@ const Bible = () => {
                 setSelectedChapter(1);
                 setVerses(data.bibleData);
             })
-            .catch(error => console.error("Error fetching version data:", error));
+            .catch(error => console.error("Error fetching version data:", error))
+            .finally(() => setLoading(false));
     }, [selectedVersion, language]);
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
@@ -56,10 +60,12 @@ const Bible = () => {
                 setSelectedChapter(1);
                 setVerses(data.bibleData);
             })
-            .catch(error => console.error("Error fetching book data:", error));
+            .catch(error => console.error("Error fetching book data:", error))
+            .finally(() => setLoading(false));
     }, [selectedBook, selectedBookIndex, selectedVersion, language]);
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${selectedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
@@ -71,7 +77,8 @@ const Bible = () => {
                     console.error('Bible data is not available in the response');
                 }
             })
-            .catch(error => console.error("Error fetching chapter data:", error));
+            .catch(error => console.error("Error fetching chapter data:", error))
+            .finally(() => setLoading(false));
     }, [selectedChapter, selectedBookIndex, selectedVersion, language]);
 
     const handleVersionChange = (e) => setSelectedVersion(e.target.value);
@@ -107,6 +114,8 @@ const Bible = () => {
 
     const handleSearchAction = (e) => {
         if(e.key === 'Enter' && searchText.trim() !== ''){
+            setLoading(true);
+
             const searchPromises = books.slice(3).map((book, index) => 
                 axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`)
             );
@@ -120,7 +129,8 @@ const Bible = () => {
                     setVerses(allVerses);
                     setResults(allVerses.length);
                 })
-                .catch(error => console.error("Error fetching search results:", error));
+                .catch(error => console.error("Error fetching search results:", error))
+                .finally(() => setLoading(false));
         }
     };
 
@@ -161,6 +171,7 @@ const Bible = () => {
                 />
             </div>
             <div id='content'>
+                {loading && <div className="loader"></div>}
                 <h1 id='title'>{selectedBook}</h1>
                 {verses.some(v => v.searched) && (
                     <p>{results} Results found</p>
