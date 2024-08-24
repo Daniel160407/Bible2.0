@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../style/Bible.scss';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Bible = () => {
     const [language, setLanguage] = useState('geo');
@@ -10,7 +11,7 @@ const Bible = () => {
     const [versesAmount, setVersesAmount] = useState([]);
     const [selectedVersion, setSelectedVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
     const [selectedBook, setSelectedBook] = useState('დაბადება');
-    const [selectedBookIndex, setSelectedBookIndex] = useState(3);
+    const [selectedBookIndex, setSelectedBookIndex] = useState(4);
     const [selectedChapter, setSelectedChapter] = useState(1);
     const [selectedVerse, setSelectedVerse] = useState(0);
     const [searchText, setSearchText] = useState('');
@@ -19,54 +20,61 @@ const Bible = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        fetchVersionsAndBooks();
+    }, [language]);
+
+    const fetchVersionsAndBooks = () => {
         setLoading(true);
-        axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
+        const cookieBook = Cookies.get('book');
+        const cookieLanguage = Cookies.get('language');
+        if(cookieBook){
+            setSelectedBookIndex(cookieBook);
+        }
+        if(cookieLanguage){
+            setLanguage(cookieLanguage);
+        }
+        axios.get(`https://holybible.ge/service.php?w=${cookieBook ? cookieBook : 4}&t=&m=&s=&language=${cookieLanguage ? cookieLanguage : language}&page=1`)
             .then(response => {
                 const data = response.data;
                 setVersions(data.versions);
                 setBooks(data.bibleNames);
-                setSelectedBook(data.bibleNames[3]);
+                setSelectedBook(data.bibleNames[cookieBook ? cookieBook - 1 : 3]);
 
                 const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
             })
             .catch(error => console.error("Error fetching versions and books:", error))
             .finally(() => setLoading(false));
-    }, [language]);
+    };
 
-    useEffect(() => {
-        setLoading(true);
-        axios.get(`https://holybible.ge/service.php?w=4&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
-            .then(response => {
-                const data = response.data;
-                const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
-                const verseArray = Array.from({ length: data.muxli[0].cc }, (_, i) => i + 1);
-                setChapters(chapterArray);
-                setVersesAmount(verseArray);
-                setSelectedChapter(1);
-                setVerses(data.bibleData);
-            })
-            .catch(error => console.error("Error fetching version data:", error))
-            .finally(() => setLoading(false));
-    }, [selectedVersion, language]);
-
-    useEffect(() => {
-        setLoading(true);
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+    const fetchBookData = () => {
+        const cookieBook = Cookies.get('book');
+        if(cookieBook || selectedBookIndex){
+            setLoading(true);
+             const cookieChapter = Cookies.get('chapter');
+        const cookieVersion = Cookies.get('version');
+        const cookieLanguage = Cookies.get('language');
+        axios.get(`https://holybible.ge/service.php?w=${cookieBook ? cookieBook : selectedBookIndex}&t=${cookieChapter ? cookieChapter : 1}&m=&s=&mv=${cookieVersion ? cookieVersion : versions[0]}&language=${cookieLanguage ? cookieLanguage : language}&page=1`)
             .then(response => {
                 const data = response.data;
                 const chapterArray = Array.from({ length: data.tavi[0].cc }, (_, i) => i + 1);
                 setChapters(chapterArray);
-                setSelectedChapter(1);
+                setSelectedChapter(cookieChapter ? cookieChapter : 1);
                 setVerses(data.bibleData);
+                setSelectedVersion(cookieVersion ? cookieVersion : selectedVersion);
             })
             .catch(error => console.error("Error fetching book data:", error))
             .finally(() => setLoading(false));
-    }, [selectedBook, selectedBookIndex, selectedVersion, language]);
+        }
+       
+    };
 
-    useEffect(() => {
-        setLoading(true);
-        axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=${selectedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+    const fetchChapterData = () => {
+        const cookieBook = Cookies.get('book');
+        if(cookieBook || selectedBookIndex){
+            setLoading(true);
+            const cookieChapter = Cookies.get('chapter');
+            axios.get(`https://holybible.ge/service.php?w=${cookieBook ? cookieBook : selectedBookIndex}&t=${cookieChapter ? cookieChapter : 1}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
                 if (data.bibleData) {
@@ -79,44 +87,71 @@ const Bible = () => {
             })
             .catch(error => console.error("Error fetching chapter data:", error))
             .finally(() => setLoading(false));
+        }
+        
+    };
+
+    useEffect(() => {
+        fetchBookData();
+    }, [selectedBook, selectedBookIndex, selectedVersion, language]);
+
+    useEffect(() => {
+        fetchChapterData();
     }, [selectedChapter, selectedBookIndex, selectedVersion, language]);
 
-    const handleVersionChange = (e) => setSelectedVersion(e.target.value);
+    const handleLanguageChange = (e) => {
+        setLanguage(e.target.value);
+        Cookies.remove('version');
+        Cookies.remove('book');
+        Cookies.remove('chapter');
+        Cookies.set('language', e.target.value, { expires: 7 });
+    }
+
+    const handleVersionChange = (e) => {
+        setSelectedVersion(e.target.value);
+        Cookies.set('version', e.target.value, { expires: 7 });
+    }
+    
     const handleBookChange = (e) => {
         const book = e.target.value;
         setSelectedBook(book);
         setSelectedBookIndex(books.indexOf(book) + 1);
         setVerses([]);
+        Cookies.remove('chapter');
+        Cookies.set('book', books.indexOf(book) + 1, { expires: 7 });
     };
-    const handleChapterChange = (e) => setSelectedChapter(e.target.value);
+    const handleChapterChange = (e) => {
+        setSelectedChapter(e.target.value);
+        Cookies.set('chapter', e.target.value, { expires: 7 });
+    }
     const handleVerseChange = (e) => {
         const verse = e.target.value;
         setSelectedVerse(verse);
-    
-        for(let i = 0; i < verses.length; i++){
-            if(verses[i].muxli == verse){
-                for(let i = 0; i < verses.length; i++){
+
+        for (let i = 0; i < verses.length; i++) {
+            if (verses[i].muxli == verse) {
+                for (let i = 0; i < verses.length; i++) {
                     document.getElementById(`verse${verses[i].id}`).style.backgroundColor = "#2b3648";
                 }
-    
+
                 const verseDiv = document.getElementById(`verse${verses[i].id}`);
                 verseDiv.style.backgroundColor = "#4a4a6a";
-    
+
                 verseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
-    }
-    
+    };
+
     const handleNextButtonClick = () => {
         const nextChapter = parseInt(selectedChapter) + 1;
         setSelectedChapter(nextChapter);
     };
 
     const handleSearchAction = (e) => {
-        if(e.key === 'Enter' && searchText.trim() !== ''){
+        if (e.key === 'Enter' && searchText.trim() !== '') {
             setLoading(true);
 
-            const searchPromises = books.slice(3).map((book, index) => 
+            const searchPromises = books.slice(3).map((book, index) =>
                 axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`)
             );
 
@@ -137,7 +172,7 @@ const Bible = () => {
     return (
         <div id='bible'>
             <div className='searchPanel'>
-                <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                <select value={language} onChange={handleLanguageChange}>
                     <option value={'geo'}>GEO</option>
                     <option value={'eng'}>ENG</option>
                     <option value={'russian'}>RUS</option>

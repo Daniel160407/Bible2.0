@@ -103,8 +103,6 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
             </div>
             <div className="selection">
                 <label htmlFor="font-size">Font Size:</label>
-                <label htmlFor="autoSize">Auto</label>
-                <input id="autoSize" type="checkbox" onChange={(e) => setFontSize(e.target.checked)}></input>
                 <select id="font-size" value={fontSize} onChange={(e) => setFontSize(e.target.value)}>
                     <option value="1">1</option>
                     <option value="2">2</option>
