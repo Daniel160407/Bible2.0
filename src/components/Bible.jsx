@@ -145,6 +145,7 @@ const Bible = () => {
     const handleNextButtonClick = () => {
         const nextChapter = parseInt(selectedChapter) + 1;
         setSelectedChapter(nextChapter);
+        Cookies.set('chapter', nextChapter, { expires: 7 });
     };
 
     const handleSearchAction = (e) => {
