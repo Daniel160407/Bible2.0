@@ -35,6 +35,17 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                     .then(response => {
                         setVerses(response.data.bibleData);
                         setSelectedChapter(1);
+
+                        const selectedVerseData = {
+                            book: data.bibleNames[3],
+                            bookIndex: 4,
+                            chapter: 1,
+                            verse: 1,
+                            till: null,
+                            bv: [response.data.bibleData[0]]
+                        }
+            
+                        setVersesToDisplay(selectedVerseData);
                     });
             })
             .catch(error => {
@@ -66,11 +77,22 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
         setSelectedBook(bookName);
         setSelectedBookIndex(bookIndex);
         setBookToDisplay(bookName);
-        axios.get(`https://holybible.ge/service.php?w=${bookIndex}&t=0&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+        axios.get(`https://holybible.ge/service.php?w=${bookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
                 setChaptersAmount(data.tavi[0].cc);
                 setVersesAmount(data.muxli[0].cc);
+
+                const selectedVerseData = {
+                    book: bookName,
+                    bookIndex: bookIndex,
+                    chapter: 1,
+                    verse: 1,
+                    till: null,
+                    bv: [data.bibleData[0]]
+                }
+    
+                setVersesToDisplay(selectedVerseData);
             })
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
@@ -88,6 +110,17 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 const data = response.data;
                 if (data.bibleData) {
                     setVerses(data.bibleData);
+
+                    const selectedVerseData = {
+                        book: selectedBook,
+                        bookIndex: selectedBookIndex,
+                        chapter: chapter,
+                        verse: 1,
+                        till: null,
+                        bv: [data.bibleData[0]]
+                    }
+        
+                    setVersesToDisplay(selectedVerseData);
                 } else {
                     console.error('Bible data is not available in the response');
                 }
