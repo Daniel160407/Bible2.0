@@ -14,19 +14,20 @@ const PresentView = () => {
         channel.onmessage = event => {
             const data = event.data;
 
-            if(data.background) {
+            if (data.background) {
                 document.body.style.backgroundImage = `url(${data.background})`;
-            } else if(data.font) {
+            } else if (data.font) {
                 document.body.style.fontFamily = data.font;
-            } else if(data.textColor){
+            } else if (data.textColor) {
                 document.body.style.color = data.textColor;
             } else {
-                if(data.show === false) {
+                if (data.show === false) {
                     setShow(false);
                 } else {
                     if (!data.versesToDisplay) {
                         setFontSize(data.fontSize);
                     } else {
+                        console.log(data.versesToDisplay)
                         setVersesToDisplay(data.versesToDisplay || []);
                         setShow(data.show);
                         setFontSize(data.fontSize);
@@ -50,44 +51,41 @@ const PresentView = () => {
         }
     }, [versesToDisplay, fontSize]);
 
+    const renderVerses = (language) => {
+        const verses = versesToDisplay[language];
+        if (show && verses && verses.bv.length > 0) {
+            return (
+                <>
+                    {verses.bv.map(verse => (
+                        <div key={verse.id} className="verse">
+                            <h1 className="verse-text">{verse.bv}</h1>
+                        </div>
+                    ))}
+                    <h1 className="verse-reference">
+                        {verses.book} {verses.chapter}:{verses.verse}
+                        {verses.till !== null ? '-' + verses.till : ''}
+                    </h1>
+                    <br />
+                </>
+            );
+        }
+        return null;
+    };
+
     return (
         <div id="present-view">
             <div id="verses">
-                {show && versesToDisplay.geo && versesToDisplay.geo.bv.length > 0 && (
-                    versesToDisplay.geo.bv.map(verse => (
-                        <div key={verse.id} className="verse">
-                            <h1 className="verse-text">{verse.bv}</h1>
-                        </div>
-                    ))
-                )}
-                {show && versesToDisplay.geo && versesToDisplay.geo.bv.length > 0 && (
-                    <h1 className="verse-reference">{versesToDisplay.geo.book} {versesToDisplay.geo.chapter}:{versesToDisplay.geo.verse}{versesToDisplay.geo.till !== null ? '-' + versesToDisplay.geo.till : ''}</h1>
-                )}
-                <br />
-                {show && versesToDisplay.eng && versesToDisplay.eng.bv.length > 0 && (
-                    versesToDisplay.eng.bv.map(verse => (
-                        <div key={verse.id} className="verse">
-                            <h1 className="verse-text">{verse.bv}</h1>
-                        </div>
-                    ))
-                )}
-                {show && versesToDisplay.eng && versesToDisplay.eng.bv.length > 0 && (
-                    <h1 className="verse-reference">{versesToDisplay.eng.book} {versesToDisplay.eng.chapter}:{versesToDisplay.eng.verse}{versesToDisplay.eng.till !== null ? '-' + versesToDisplay.eng.till : ''}</h1>
-                )}
-                <br />
-                {show && versesToDisplay.rus && versesToDisplay.rus.bv.length > 0 && (
-                    versesToDisplay.rus.bv.map(verse => (
-                        <div key={verse.id} className="verse">
-                            <h1 className="verse-text">{verse.bv}</h1>
-                        </div>
-                    ))
-                )}
-                {show && versesToDisplay.rus && versesToDisplay.rus.bv.length > 0 && (
-                    <h1 className="verse-reference">{versesToDisplay.rus.book} {versesToDisplay.rus.chapter}:{versesToDisplay.rus.verse}{versesToDisplay.rus.till !== null ? '-' + versesToDisplay.rus.till : ''}</h1>
-                )}
+                {renderVerses('geo')}
+                {renderVerses('eng')}
+                {renderVerses('rus')}
+                {renderVerses('ua')}
+                {renderVerses('fr')}
+                {renderVerses('gr')}
+                {renderVerses('tr')}
+                {renderVerses('es')}
             </div>
         </div>
     );
-}
+};
 
 export default PresentView;

@@ -265,6 +265,11 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 <option value="geo">GEO</option>
                 <option value="eng">ENG</option>
                 <option value="russian">RUS</option>
+                <option value='ua'>UA</option>
+                <option value='fr'>FR</option>
+                <option value='gr'>GR</option>
+                <option value='tr'>TR</option>
+                <option value='es'>SP</option>
             </select>
             <select id="versions" value={selectedVersion} onChange={(e) => setSelectedVersion(e.target.value)}>
                 {versions.map(version => (

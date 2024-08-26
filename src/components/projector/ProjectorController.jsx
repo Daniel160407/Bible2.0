@@ -6,10 +6,20 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
+    const [uaVersions, setUaVersions] = useState([]);
+    const [frVersions, setFrVersions] = useState([]);
+    const [grVersions, setGrVersions] = useState([]);
+    const [trVersions, setTrVersions] = useState([]);
+    const [esVersions, setEsVersions] = useState([]);
 
     const [selectedGeoVersion, setSelectedGeoVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
     const [selectedEngVersion, setSelectedEngVersion] = useState('NASB New American Standard Bible');
     const [selectedRusVersion, setSelectedRusVersion] = useState('Синодальный перевод');
+    const [selectedUaVersion, setSelectedUaVersion] = useState('Іван Огієнко - 1930');
+    const [selectedFrVersion, setSelectedFrVersion] = useState('Louis Segond 1910');
+    const [selectedGrVersion, setSelectedGrVersion] = useState('Septuagint LXX');
+    const [selectedTrVersion, setSelectedTrVersion] = useState('Kutsal Kitap 1989');
+    const [selectedEsVersion, setSelectedEsVersion] = useState('Dios Habla Hoy');
 
     useEffect(() => {
         const fetchVersions = async () => {
@@ -22,6 +32,21 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
 
                 const rusResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=russian&page=1');
                 setRusVersions(rusResponse.data.versions);
+
+                const uaResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=ua&page=1');
+                setUaVersions(uaResponse.data.versions);
+
+                const frResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=fr&page=1');
+                setFrVersions(frResponse.data.versions);
+
+                const grResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=gr&page=1');
+                setGrVersions(grResponse.data.versions);
+
+                const trResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=tr&page=1');
+                setTrVersions(trResponse.data.versions);
+
+                const esResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=es&page=1');
+                setEsVersions(esResponse.data.versions);
             } catch (error) {
                 console.error("Error fetching versions: ", error);
             }
@@ -32,60 +57,39 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
         const versions = {
             geo: selectedGeoVersion,
             eng: selectedEngVersion,
-            rus: selectedRusVersion
+            rus: selectedRusVersion,
+            ua: selectedUaVersion,
+            fr: selectedFrVersion,
+            gr: selectedGrVersion,
+            tr: selectedTrVersion,
+            es: selectedEsVersion,
         }
 
         setVersions(versions);
-    }, [selectedGeoVersion, selectedEngVersion, selectedRusVersion, setVersions]);
+    }, [
+        selectedGeoVersion, 
+        selectedEngVersion, 
+        selectedRusVersion, 
+        selectedUaVersion,
+        selectedFrVersion,
+        selectedGrVersion,
+        selectedTrVersion,
+        selectedEsVersion,
+        setVersions
+    ]);
 
-    const handleGeoVersionsChange = (e) => {
-        if (document.getElementById('georgian').checked) {
-            setSelectedGeoVersion(e.target.value);
-            setVersions(prevVersions => ({
-                ...prevVersions,
-                geo: e.target.value
-            }));
-        }
-    };
-
-    const handleEngVersionsChange = (e) => {
-        if (document.getElementById('english').checked) {
-            setSelectedEngVersion(e.target.value);
-            setVersions(prevVersions => ({
-                ...prevVersions,
-                eng: e.target.value
-            }));
-        }
-    };
-
-    const handleRusVersionsChange = (e) => {
-        if (document.getElementById('russian').checked) {
-            setSelectedRusVersion(e.target.value);
-            setVersions(prevVersions => ({
-                ...prevVersions,
-                rus: e.target.value
-            }));
-        }
-    };
-
-    const handleGeoCheckboxChange = (e) => {
+    const handleCheckboxChange = (langKey, checked) => {
         setLanguages(prevLanguages => ({
             ...prevLanguages,
-            geo: e.target.checked
+            [langKey]: checked
         }));
     };
 
-    const handleEngCheckboxChange = (e) => {
-        setLanguages(prevLanguages => ({
-            ...prevLanguages,
-            eng: e.target.checked
-        }));
-    };
-
-    const handleRusCheckboxChange = (e) => {
-        setLanguages(prevLanguages => ({
-            ...prevLanguages,
-            rus: e.target.checked
+    const handleVersionChange = (langKey, version, setSelectedVersion) => {
+        setSelectedVersion(version);
+        setVersions(prevVersions => ({
+            ...prevVersions,
+            [langKey]: version
         }));
     };
 
@@ -135,33 +139,26 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                     <option style={{color: '#ea1f36'}} value='#ea1f36'>Red</option>
                 </select>
             </div>
-            <div className="selection">
-                <label htmlFor="georgian">Georgian</label>
-                <input id="georgian" type="checkbox" onChange={handleGeoCheckboxChange}></input>
-                <select id="geoVersions" value={selectedGeoVersion} onChange={handleGeoVersionsChange}>
-                    {geoVersions.map(version => (
-                        <option key={version} value={version}>{version}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="selection">
-                <label htmlFor="english">English</label>
-                <input id="english" type="checkbox" onChange={handleEngCheckboxChange}></input>
-                <select id="engVersions" value={selectedEngVersion} onChange={handleEngVersionsChange}>
-                    {engVersions.map(version => (
-                        <option key={version} value={version}>{version}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="selection">
-                <label htmlFor="russian">Russian</label>
-                <input id="russian" type="checkbox" onChange={handleRusCheckboxChange}></input>
-                <select id="rusVersions" value={selectedRusVersion} onChange={handleRusVersionsChange}>
-                    {rusVersions.map(version => (
-                        <option key={version} value={version}>{version}</option>
-                    ))}
-                </select>
-            </div>
+            {[
+                { langKey: 'geo', label: 'Georgian', versions: geoVersions, selectedVersion: selectedGeoVersion, setSelectedVersion: setSelectedGeoVersion },
+                { langKey: 'eng', label: 'English', versions: engVersions, selectedVersion: selectedEngVersion, setSelectedVersion: setSelectedEngVersion },
+                { langKey: 'rus', label: 'Russian', versions: rusVersions, selectedVersion: selectedRusVersion, setSelectedVersion: setSelectedRusVersion },
+                { langKey: 'ua', label: 'Ukrainian', versions: uaVersions, selectedVersion: selectedUaVersion, setSelectedVersion: setSelectedUaVersion },
+                { langKey: 'fr', label: 'French', versions: frVersions, selectedVersion: selectedFrVersion, setSelectedVersion: setSelectedFrVersion },
+                { langKey: 'gr', label: 'Greek', versions: grVersions, selectedVersion: selectedGrVersion, setSelectedVersion: setSelectedGrVersion },
+                { langKey: 'tr', label: 'Turkish', versions: trVersions, selectedVersion: selectedTrVersion, setSelectedVersion: setSelectedTrVersion },
+                { langKey: 'es', label: 'Spanish', versions: esVersions, selectedVersion: selectedEsVersion, setSelectedVersion: setSelectedEsVersion },
+            ].map(({ langKey, label, versions, selectedVersion, setSelectedVersion }) => (
+                <div key={langKey} className="selection">
+                    <label htmlFor={langKey}>{label}</label>
+                    <input id={langKey} type="checkbox" onChange={(e) => handleCheckboxChange(langKey, e.target.checked)}></input>
+                    <select id={`${langKey}Versions`} value={selectedVersion} onChange={(e) => handleVersionChange(langKey, e.target.value, setSelectedVersion)}>
+                        {versions.map(version => (
+                            <option key={version} value={version}>{version}</option>
+                        ))}
+                    </select>
+                </div>
+            ))}
         </div>
     );
 }

@@ -174,9 +174,14 @@ const Bible = () => {
         <div id='bible'>
             <div className='searchPanel'>
                 <select value={language} onChange={handleLanguageChange}>
-                    <option value={'geo'}>GEO</option>
-                    <option value={'eng'}>ENG</option>
-                    <option value={'russian'}>RUS</option>
+                    <option value="geo">GEO</option>
+                    <option value="eng">ENG</option>
+                    <option value="russian">RUS</option>
+                    <option value='ua'>UA</option>
+                    <option value='fr'>FR</option>
+                    <option value='gr'>GR</option>
+                    <option value='tr'>TR</option>
+                    <option value='es'>SP</option>
                 </select>
                 <select value={selectedVersion} onChange={handleVersionChange}>
                     {versions.map(version => (
