@@ -18,8 +18,10 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
     const [selectedTill, setSelectedTill] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [wholeBible, setWholeBible] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
             .then(response => {
                 const data = response.data;
@@ -51,10 +53,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             })
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
-            });
+            })
+            .finally(() => setLoading(false));
     }, [language]);
 
     const handleLanguageChange = (e) => {
+        setLoading(true);
         const selectedLanguage = e.target.value;
         setLanguage(selectedLanguage);
         axios.get(`https://holybible.ge/service.php?w=4&t=0&m=&s=&language=${selectedLanguage}&page=1`)
@@ -65,10 +69,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             })
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
-            });
+            })
+            .finally(() => setLoading(false));
     }
 
     const handleBookChange = (e) => {
+        setLoading(true);
         setSelectedChapter('');
         setSelectedVerse(null);
         setSelectedTill(null);
@@ -97,10 +103,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             })
             .catch(error => {
                 console.error("There was an error fetching the versions!", error);
-            });
+            })
+            .finally(() => setLoading(false));
     }
 
     const handleChapterChange = (e) => {
+        setLoading(true);
         setSelectedVerse(null);
         setSelectedTill(null);
 
@@ -129,7 +137,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             })
             .catch(error => {
                 console.error("There was an error fetching the chapters!", error);
-            });
+            })
+            .finally(() => setLoading(false)); 
     }
 
     const handleVerseChange = (e) => {
@@ -172,9 +181,9 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
     }
 
     const handleKeyPress = (e) => {
-        setSeperatedVerse(null);
-
         if (e.key === 'Enter') {
+            setLoading(true);
+            setSeperatedVerse(null);
             const pattern = /(\d?\D+?) (\d+):(\d+)(?:-(\d+))?/;
             const matcher = searchText.match(pattern);
 
@@ -213,7 +222,6 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
                                 setVerses(data.bibleData);
                                 const versesToDisplayArray = data.bibleData.slice(searchedVerse - 1, searchedTill ? searchedTill : searchedVerse);
     
-                                console.log(`Index: ${bookindex}`);
                                 const versesToDisplay = {
                                     book: books[bookindex - 1],
                                     bookIndex: bookindex,
@@ -229,7 +237,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
                         })
                         .catch(error => {
                             console.error("There was an error fetching the chapters!", error);
-                        });
+                        })
+                        .finally(() => setLoading(false));
                 } else {
                     console.error('Book not found');
                 }
@@ -245,10 +254,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
 
                             allVerses.forEach(verse => {
                                 verse.wholeBible = true;
-                                console.log(verse);
                                 verse.book = books[parseInt(verse.wigni) + 2];
                                 verse.bookIndex = parseInt(verse.wigni) + 2;
-                                console.log(verse.book);
                             });
                             
                             const versesToDisplay = {
@@ -262,6 +269,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
                             setVersesToDisplay(versesToDisplay);
                         })
                         .catch(error => console.error("Error fetching search results:", error))
+                        .finally(() => setLoading(false));
                 } else {
                     axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=&m=&s=${e.target.value}&mv=${selectedVersion}&language=${language}&page=1`)
                     .then(response => {
@@ -276,7 +284,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
                             bv: data.bibleData
                         }
                         setVersesToDisplay(versesToDisplay);
-                    });
+                    })
+                    .finally(() => setLoading(false));
                 }
             }
         }
@@ -334,6 +343,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             <input id="search" type="text" placeholder="Search" value={searchText} onKeyPress={handleKeyPress} onChange={(e) => setSearchText(e.target.value)}></input>
             <input id="wholeBible" type="checkbox" onChange={() => setWholeBible(!wholeBible)}></input>
             <button id="clearButton" onClick={onClearButtonClick}>Clear</button>
+            {loading && <div className="loader"></div>}
         </div>
     );
 }
