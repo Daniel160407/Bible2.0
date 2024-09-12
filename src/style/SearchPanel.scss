@@ -103,4 +103,17 @@ $select-padding: 0.5rem;
     transform: translate(-50%, -50%);
     animation: l10 1.5s infinite;
   }
+
+  .arrows {
+    display: flex;
+    align-items: center;
+
+    .arrow {
+      cursor: pointer;
+      
+      color: #edf8ff;
+      width: 30px;
+      height: 30px;
+    }
+  }
 }
