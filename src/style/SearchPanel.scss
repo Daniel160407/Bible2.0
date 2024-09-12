@@ -90,6 +90,14 @@ $select-padding: 0.5rem;
     }
   }
 
+  #wholeBible {
+    margin-right: 1rem;
+    accent-color: #007bff;
+    transform: scale(1.5);
+    margin: 0.5rem;
+    cursor: pointer;
+  }
+
   .loader {
     position: fixed;
     top: 50%;

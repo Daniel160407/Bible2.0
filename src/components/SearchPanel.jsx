@@ -356,12 +356,12 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
             </select>
             <input id="search" type="text" placeholder="Search" value={searchText} onKeyPress={handleKeyPress} onChange={(e) => setSearchText(e.target.value)}></input>
             <input id="wholeBible" type="checkbox" onChange={() => setWholeBible(!wholeBible)}></input>
-            <button id="clearButton" onClick={onClearButtonClick}>Clear</button>
-            {loading && <div className="loader"></div>}
-                <div className="arrows">
+            <div className="arrows">
                     <svg onClick={handleLeftArrowClick} stroke="currentColor" fill="currentColor" strokeWidth="0" version="1.2" baseProfile="tiny" viewBox="0 0 24 24" className="arrow" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M18 11h-7.244l1.586-1.586c.781-.781.781-2.049 0-2.828-.781-.781-2.047-.781-2.828 0l-6.414 6.414 6.414 6.414c.39.391.902.586 1.414.586s1.023-.195 1.414-.586c.781-.781.781-2.049 0-2.828l-1.586-1.586h7.244c1.104 0 2-.896 2-2 0-1.105-.896-2-2-2z"></path></svg>
                     <svg onClick={handleRightArrowClick} stroke="currentColor" fill="currentColor" strokeWidth="0" version="1.2" baseProfile="tiny" viewBox="0 0 24 24" className="arrow" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.586 6.586c-.781.779-.781 2.047 0 2.828l1.586 1.586h-7.244c-1.104 0-2 .895-2 2 0 1.104.896 2 2 2h7.244l-1.586 1.586c-.781.779-.781 2.047 0 2.828.391.391.902.586 1.414.586s1.023-.195 1.414-.586l6.414-6.414-6.414-6.414c-.781-.781-2.047-.781-2.828 0z"></path></svg>
                 </div>
+            <button id="clearButton" onClick={onClearButtonClick}>Clear</button>
+            {loading && <div className="loader"></div>}
             </div>
     );
 }
