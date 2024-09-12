@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import '../style/SearchPanel.scss';
 
-const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
+const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }) => {
     const [language, setLanguage] = useState('geo');
     const [versions, setVersions] = useState([]);
     const [books, setBooks] = useState([]);
@@ -17,6 +17,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     const [selectedVerse, setSelectedVerse] = useState(null);
     const [selectedTill, setSelectedTill] = useState(null);
     const [searchText, setSearchText] = useState('');
+    const [wholeBible, setWholeBible] = useState(false);
 
     useEffect(() => {
         axios.get(`https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`)
@@ -171,6 +172,8 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
     }
 
     const handleKeyPress = (e) => {
+        setSeperatedVerse(null);
+
         if (e.key === 'Enter') {
             const pattern = /(\d?\D+?) (\d+):(\d+)(?:-(\d+))?/;
             const matcher = searchText.match(pattern);
@@ -185,6 +188,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                     if (books[i].toLowerCase().startsWith(searchedBook.toLowerCase())) {
                         setSelectedBook(books[i]);
                         bookindex = i + 1;
+                        setSelectedBookIndex(bookindex);
                         setBookToDisplay(books[i]);
                         bookFound = true;
                         break;
@@ -209,6 +213,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                                 setVerses(data.bibleData);
                                 const versesToDisplayArray = data.bibleData.slice(searchedVerse - 1, searchedTill ? searchedTill : searchedVerse);
     
+                                console.log(`Index: ${bookindex}`);
                                 const versesToDisplay = {
                                     book: books[bookindex - 1],
                                     bookIndex: bookindex,
@@ -229,7 +234,36 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                     console.error('Book not found');
                 }
             } else {
-                axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=&m=&s=${e.target.value}&mv=${selectedVersion}&language=${language}&page=1`)
+                if(wholeBible) {
+                    const searchPromises = books.slice(3).map((book, index) =>
+                        axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`)
+                    );
+        
+                    Promise.all(searchPromises)
+                        .then(results => {
+                            const allVerses = results.flatMap(result => result.data.bibleData || []);
+
+                            allVerses.forEach(verse => {
+                                verse.wholeBible = true;
+                                console.log(verse);
+                                verse.book = books[parseInt(verse.wigni) + 2];
+                                verse.bookIndex = parseInt(verse.wigni) + 2;
+                                console.log(verse.book);
+                            });
+                            
+                            const versesToDisplay = {
+                                book: null,
+                                bookIndex: null,
+                                chapter: null,
+                                verse: null,
+                                till: null,
+                                bv: allVerses
+                            }
+                            setVersesToDisplay(versesToDisplay);
+                        })
+                        .catch(error => console.error("Error fetching search results:", error))
+                } else {
+                    axios.get(`https://holybible.ge/service.php?w=${selectedBookIndex}&t=&m=&s=${e.target.value}&mv=${selectedVersion}&language=${language}&page=1`)
                     .then(response => {
                         const data = response.data;
 
@@ -243,6 +277,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                         }
                         setVersesToDisplay(versesToDisplay);
                     });
+                }
             }
         }
     }
@@ -297,6 +332,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay }) => {
                 ))}
             </select>
             <input id="search" type="text" placeholder="Search" value={searchText} onKeyPress={handleKeyPress} onChange={(e) => setSearchText(e.target.value)}></input>
+            <input id="wholeBible" type="checkbox" onChange={() => setWholeBible(!wholeBible)}></input>
             <button id="clearButton" onClick={onClearButtonClick}>Clear</button>
         </div>
     );

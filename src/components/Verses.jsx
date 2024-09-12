@@ -3,7 +3,7 @@ import '../style/Verses.scss';
 import '../style/Fonts.scss';
 import { useEffect, useState } from 'react';
 
-const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
+const Verses = ({ versesToDisplay, setVersesToDisplay, setSeparatedProjectorVerse }) => {
     const [showSeparatedVerse, setShowSeparatedVerse] = useState(false);
     const [separatedVerse, setSeparatedVerse] = useState(null);
 
@@ -17,6 +17,14 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
         setSeparatedVerse(verse);
         setSeparatedProjectorVerse(verse);
         setShowSeparatedVerse(true);
+        if(!versesToDisplay.book){
+            console.log(verse.book);
+            console.log(verse.bookIndex);
+            versesToDisplay.book = verse.book;
+            versesToDisplay.bookIndex = parseInt(verse.bookIndex);
+            versesToDisplay.bv = [verse];
+            setVersesToDisplay(versesToDisplay);
+        }
     };
 
     return (
@@ -40,7 +48,7 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
                                     dangerouslySetInnerHTML={{ __html: verse.bv }}
                                 ></h1>
                                 <h1 className="verse-reference">
-                                    {versesToDisplay.book} {verse.tavi}:{verse.muxli}
+                                    {versesToDisplay.book ? versesToDisplay.book : verse.book} {verse.tavi}:{verse.muxli}
                                 </h1>
                                 <div className="separateDiv">
                                     <button className="separateButton" onClick={() => handleSeparate(verse)}>Separate</button>
@@ -57,7 +65,7 @@ const Verses = ({ versesToDisplay, setSeparatedProjectorVerse }) => {
                 <div className="verse">
                     <h1 className="verse-text" dangerouslySetInnerHTML={{ __html: separatedVerse.bv}}></h1>
                     <h1 className="verse-reference">
-                        {versesToDisplay.book} {separatedVerse.tavi}:{separatedVerse.muxli}
+                        {versesToDisplay.book ? versesToDisplay.book : separatedVerse.book} {separatedVerse.tavi}:{separatedVerse.muxli}
                     </h1>
                 </div>
             )}

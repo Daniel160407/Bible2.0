@@ -67,6 +67,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
         if (show) {
             const fetchVerses = async (language, version, books, setVerses) => {
                 try {
+                    console.log("ssssssssssssssssss: "+separatedVerse);
                     const response = await axios.get(`https://holybible.ge/service.php?w=${separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex}&t=${separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter}&m=&s=&mv=${version}&language=${language}&page=1`);
                     const bibleData = response.data.bibleData;
                     let bv = [];

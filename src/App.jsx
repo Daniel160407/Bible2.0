@@ -10,8 +10,8 @@ const App = () => {
 
   return (
     <>
-      <SearchPanel setVersesToDisplay={setVersesToDisplay} setBookToDisplay={setBookToDisplay}/>
-      <Verses versesToDisplay={versesToDisplay} setSeparatedProjectorVerse={setSeparatedVerse}/>
+      <SearchPanel setVersesToDisplay={setVersesToDisplay} setBookToDisplay={setBookToDisplay} setSeperatedVerse={setSeparatedVerse}/>
+      <Verses versesToDisplay={versesToDisplay} setVersesToDisplay={setVersesToDisplay} setSeparatedProjectorVerse={setSeparatedVerse}/>
       <Controller versesToDisplay={versesToDisplay} separatedVerse={separatedVerse}/>
     </>
   )
