@@ -38,6 +38,7 @@ const SearchPanel = ({ setVersesToDisplay, setBookToDisplay, setSeperatedVerse }
                     .then(response => {
                         setVerses(response.data.bibleData);
                         setSelectedChapter(1);
+                        setSelectedVerse(0);
 
                         const selectedVerseData = {
                             book: data.bibleNames[3],
