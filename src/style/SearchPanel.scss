@@ -124,4 +124,125 @@ $select-padding: 0.5rem;
       height: 30px;
     }
   }
+  
+  .farmer-container {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    cursor: pointer;
+  
+    .cloud {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border-radius: 50px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 200px;
+  
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 10px;
+        border-style: solid;
+        border-color: #ffffff transparent transparent transparent;
+      }
+  
+      .message {
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 14px;
+        color: #333;
+      }
+    }
+  
+    .farmer {
+      position: relative;
+      margin-top: 90px;
+  
+      .hat {
+        width: 80px;
+        height: 20px;
+        background: #8B4513;
+        border-radius: 50% / 100% 100% 0 0;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+  
+      .body {
+        width: 60px;
+        height: 100px;
+        background: #006400;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 0 0 10px 10px;
+      }
+  
+      .legs {
+        width: 10px;
+        height: 60px;
+        background: #8B4513;
+        position: absolute;
+        top: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+  
+      .arms {
+        width: 20px;
+        height: 70px;
+        background: #8B4513;
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 10px;
+      }
+  
+      .face {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: #FFDBAC;
+        border-radius: 50%;
+        
+        .eyes {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          width: 20px;
+          height: 10px;
+          background: #000;
+          border-radius: 50%;
+        }
+  
+        .mouth {
+          position: absolute;
+          top: 25px;
+          left: 12px;
+          width: 16px;
+          height: 5px;
+          background: #FF6347;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+  
 }
