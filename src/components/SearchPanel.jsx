@@ -483,7 +483,7 @@ const SearchPanel = ({
           <div className="cloud">
             <p className="message">
               Welcome to the Bible app! Please read a{" "}
-              <a href="/documentation">documentation</a>, or scroll down in
+              <a onClick={handleFarmerClick} href="/documentation" target="_blank">documentation</a>, or scroll down in
               documentation to watch a video instruction.
             </p>
           </div>
