@@ -358,11 +358,11 @@ const SearchPanel = ({
   };
 
   const handleLeftArrowClick = () => {
-    handleVerseChange(parseInt(selectedVerse) - 1);
+    handleVerseChange(parseInt(selectedVerse > 0 ? selectedVerse : selectedVerse + 1) - 1);
   };
 
   const handleRightArrowClick = () => {
-    handleVerseChange(parseInt(selectedVerse) + 1);
+    handleVerseChange(parseInt(selectedVerse <= versesAmount ? selectedVerse : selectedVerse - 1) + 1);
   };
 
   const handleFarmerClick = () => {
