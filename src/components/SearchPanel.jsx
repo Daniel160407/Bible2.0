@@ -24,8 +24,8 @@ const SearchPanel = ({
   const [searchText, setSearchText] = useState("");
   const [wholeBible, setWholeBible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [newCostumer, setNewCostumer] = useState(
-    Cookies.get("newCostumer") || true
+  const [newCustomer, setNewCustomer] = useState(
+    Cookies.get("newCustomer") || true
   );
 
   useEffect(() => {
@@ -366,8 +366,8 @@ const SearchPanel = ({
   };
 
   const handleFarmerClick = () => {
-    Cookies.set("newCostumer", false, { expires: 365 });
-    setNewCostumer(false);
+    Cookies.set("newCustomer", false, { expires: 365 });
+    setNewCustomer(false);
   };
 
   return (
@@ -478,7 +478,7 @@ const SearchPanel = ({
         Clear
       </button>
       {loading && <div className="loader"></div>}
-      {newCostumer && (
+      {newCustomer === true && (
         <div onClick={handleFarmerClick} className="farmer-container">
           <div className="cloud">
             <p className="message">
