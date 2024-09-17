@@ -66,7 +66,7 @@ const Documentation = () => {
             დაბლა, პანელში დაინახავ ღილაკს "Open Present View" დააჭირე და
             გადაგიყვანს ახალ ტაბზე. ეს გვერდი უნდა აჩვენო პროექტორზე. იმისათვის
             რომ ბრაუზერის ზედა მხარე არ გამოჩნდეს თუ ვინდოუსზე ხარ დააჭირე
-            F11-ს.
+            F11-ს. <span className="redText">Present View უნდა გახსნად მხოლოდ ერთხელ!</span>
           </p>
           <br />
           <p>
@@ -159,7 +159,7 @@ const Documentation = () => {
             In the bottom panel, you will see a button "Open Present View".
             Click it, and it will take you to a new tab. This page should be
             shown on the projector. To hide the browser's top bar, if you are on
-            Windows, press F11.
+            Windows, press F11. <span className="redText">Present View must be opened only once!</span>
           </p>
           <br />
           <p>
@@ -247,7 +247,7 @@ const Documentation = () => {
           <p>
             На нижней панели нажмите кнопку "Open Present View", чтобы открыть
             новую вкладку. Эта страница будет отображаться на проекторе. Чтобы
-            скрыть верхнюю панель браузера в Windows, нажмите F11.
+            скрыть верхнюю панель браузера в Windows, нажмите F11. <span className="redText">Present View необходимо открывать только один раз!</span>
           </p>
           <br />
           <p>

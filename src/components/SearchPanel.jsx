@@ -93,7 +93,7 @@ const SearchPanel = ({
 
   const handleBookChange = (e) => {
     setLoading(true);
-    setSelectedChapter("");
+    setSelectedChapter(null);
     setSelectedVerse(null);
     setSelectedTill(null);
 
@@ -179,10 +179,11 @@ const SearchPanel = ({
     setSelectedVerseIndex(verseIndex);
 
     if (verses && verses.length > verseIndex) {
+      console.log(selectedChapter);
       const selectedVerseData = {
         book: selectedBook,
         bookIndex: selectedBookIndex,
-        chapter: parseInt(selectedChapter) || 1,
+        chapter: selectedChapter ? parseInt(selectedChapter) : 1,
         verse: parseInt(verseIndex + 1),
         till: null,
         bv: [verses[verseIndex]],
