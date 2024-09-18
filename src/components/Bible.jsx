@@ -18,6 +18,9 @@ const Bible = () => {
     const [verses, setVerses] = useState([]);
     const [results, setResults] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [bookToDisplay, setBookToDisplay] = useState(null);
+    const [selectedVerseIndex, setSelectedVerseIndex] = useState(null);
+    const [search, setSearch] = useState(false);
 
     useEffect(() => {
         fetchVersionsAndBooks();
@@ -92,11 +95,15 @@ const Bible = () => {
     };
 
     useEffect(() => {
-        fetchBookData();
+        if(!search){
+            fetchBookData();
+        }
     }, [selectedBook, selectedBookIndex, selectedVersion, language]);
 
     useEffect(() => {
-        fetchChapterData();
+        if(!search){
+            fetchChapterData();
+        }
     }, [selectedChapter, selectedBookIndex, selectedVersion, language]);
 
     const handleLanguageChange = (e) => {
@@ -117,11 +124,13 @@ const Bible = () => {
         setSelectedBook(book);
         setSelectedBookIndex(books.indexOf(book) + 1);
         setVerses([]);
+        setSearch(false);
         Cookies.remove('chapter');
         Cookies.set('book', books.indexOf(book) + 1, { expires: 7 });
     };
     const handleChapterChange = (e) => {
         setSelectedChapter(e.target.value);
+        setSearch(false);
         Cookies.set('chapter', e.target.value, { expires: 7 });
     }
     const handleVerseChange = (e) => {
@@ -151,8 +160,73 @@ const Bible = () => {
     const handleSearchAction = (e) => {
         if (e.key === 'Enter' && searchText.trim() !== '') {
             setLoading(true);
+            setSearch(true);
 
-            const searchPromises = books.slice(3).map((book, index) =>
+            const pattern = /(\d?\D+?) (\d+)(?::(\d+))?/;
+            const matcher = searchText.match(pattern);
+
+            let bookindex;
+
+            if (matcher) {
+                const searchedBook = matcher[1].trim();
+                let bookFound = false;
+                console.log('book: '+searchedBook);
+
+                for (let i = 0; i < books.length; i++) {
+                    if (books[i].toLowerCase().startsWith(searchedBook.toLowerCase())) {
+                        setSelectedBook(books[i]);
+                        bookindex = i + 1;
+                        setSelectedBookIndex(bookindex);
+                        setBookToDisplay(books[i]);
+                        bookFound = true;
+                        break;
+                    }
+                }
+
+                if (bookFound) {
+                    const searchedChapter = parseInt(matcher[2], 10);
+                    setSelectedChapter(searchedChapter);
+                    console.log('chapter: '+searchedChapter)
+
+                    const verseIdentified = !(typeof matcher[3] === 'undefined');
+                    console.log(verseIdentified);
+                    console.log(matcher[3]);
+
+                    let bibleData;
+
+                    axios.get(`https://holybible.ge/service.php?w=${bookindex}&t=${searchedChapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`)
+                        .then(response => {
+                            bibleData = response.data.bibleData;
+                            setVerses(bibleData);
+                        })
+                        .then(() => {
+                            console.log(bibleData);
+                            if (verseIdentified) {
+                                const searchedVerse = parseInt(matcher[3], 10);
+                                console.log(searchedVerse)
+                                setSelectedVerse(searchedVerse - 1);
+                                setSelectedVerseIndex(searchedVerse - 1);
+
+                                for (let i = 0; i < bibleData.length; i++) {
+                                    if (bibleData[i].muxli == searchedVerse) {
+                                        for (let j = 0; j < bibleData.length; j++) {
+                                            document.getElementById(`verse${bibleData[j].id}`).style.backgroundColor = "#2b3648";
+                                        }
+                        
+                                        const verseDiv = document.getElementById(`verse${bibleData[i].id}`);
+                                        verseDiv.style.backgroundColor = "#4a4a6a";
+                                        console.log(verseDiv.innerText)
+                                        console.log(verses)
+                        
+                                        verseDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }
+                            }
+                        })
+                        .finally(() => setLoading(false));
+                }
+            } else {
+                const searchPromises = books.slice(3).map((book, index) =>
                 axios.get(`https://holybible.ge/service.php?w=${index + 4}&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`)
             );
 
@@ -167,6 +241,7 @@ const Bible = () => {
                 })
                 .catch(error => console.error("Error fetching search results:", error))
                 .finally(() => setLoading(false));
+            }            
         }
     };
 
