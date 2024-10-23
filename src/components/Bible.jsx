@@ -170,7 +170,6 @@ const Bible = () => {
             if (matcher) {
                 const searchedBook = matcher[1].trim();
                 let bookFound = false;
-                console.log('book: '+searchedBook);
 
                 for (let i = 0; i < books.length; i++) {
                     if (books[i].toLowerCase().startsWith(searchedBook.toLowerCase())) {
@@ -186,11 +185,8 @@ const Bible = () => {
                 if (bookFound) {
                     const searchedChapter = parseInt(matcher[2], 10);
                     setSelectedChapter(searchedChapter);
-                    console.log('chapter: '+searchedChapter)
 
                     const verseIdentified = !(typeof matcher[3] === 'undefined');
-                    console.log(verseIdentified);
-                    console.log(matcher[3]);
 
                     let bibleData;
 
@@ -301,6 +297,9 @@ const Bible = () => {
             </div>
             <div className='controlls'>
                 <button onClick={handleNextButtonClick}>Next Chapter</button>
+            </div>
+            <div className='madeBy'>
+                <p>Made with <span className='redHeart'>&#10084;</span> by <a href='https://portfoliodanielabulashvili.netlify.app/' target='_blank' rel='noopener noreferrer'>Daniel</a></p>
             </div>
         </div>
     );

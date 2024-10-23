@@ -218,4 +218,18 @@
           }
         }
     }
+
+    .madeBy {
+        color: #f4f4f4;
+        text-align: center;
+    
+        a {
+          color: #f4f4f4;
+          text-decoration: underline;
+          padding: 0px;
+        }
+        .redHeart {
+          color: red;
+      }
+      }
 }

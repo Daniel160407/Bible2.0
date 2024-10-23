@@ -34,7 +34,7 @@ const Buttons = () => {
                 <button onClick={onOpenPresentViewClick} className="button-85" role="button">Open Present View</button>
             </div>
             <div className='madeBy'>
-                <p>Made By <a href='https://portfoliodanielabulashvili.netlify.app/' target='_blank' rel='noopener noreferrer'>Daniel</a></p>
+                <p>Made with <span className='redHeart'>&#10084;</span> by <a href='https://portfoliodanielabulashvili.netlify.app/' target='_blank' rel='noopener noreferrer'>Daniel</a></p>
             </div>
         </div>
     );
