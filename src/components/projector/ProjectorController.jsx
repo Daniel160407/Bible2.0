@@ -97,8 +97,13 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
         <div id="projectorController">
             <div className="buttons">
                 <button onClick={() => {
-                    setShow(true);
-                    setClear(false);
+                    const languages = document.getElementsByClassName('languageCheckbox');
+                    for (let i = 0; i < languages.length; i++){
+                        if (languages[i].checked){
+                            setShow(true);
+                            setClear(false);
+                        }
+                    }
                 }}>Show</button>
                 <button onClick={() => {
                     setClear(true);
@@ -151,7 +156,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
             ].map(({ langKey, label, versions, selectedVersion, setSelectedVersion }) => (
                 <div key={langKey} className="selection">
                     <label htmlFor={langKey}>{label}</label>
-                    <input id={langKey} type="checkbox" onChange={(e) => handleCheckboxChange(langKey, e.target.checked)}></input>
+                    <input className="languageCheckbox" id={langKey} type="checkbox" onChange={(e) => handleCheckboxChange(langKey, e.target.checked)}></input>
                     <select id={`${langKey}Versions`} value={selectedVersion} onChange={(e) => handleVersionChange(langKey, e.target.value, setSelectedVersion)}>
                         {versions.map(version => (
                             <option key={version} value={version}>{version}</option>
