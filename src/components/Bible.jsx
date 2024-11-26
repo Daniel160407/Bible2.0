@@ -244,10 +244,22 @@ const Bible = () => {
     };
 
     const handleCopy = (text, path) => {
-        const copyText = `${text}\n${path}`;
-        navigator.clipboard.writeText(copyText)
+        const copyText = `
+            <div style="font-family: Arial, sans-serif;">
+                <p style="margin: 10px 0; font-size: 14px;">"${text}"</p>
+                <p style="margin: 0; font-size: 18px; font-weight: bold;">${path}</p>
+            </div>
+        `;
+    
+        navigator.clipboard.write([
+            new ClipboardItem({
+                'text/html': new Blob([copyText], { type: 'text/html' }),
+                'text/plain': new Blob([`${text}\n${path}`], { type: 'text/plain' })
+            })
+        ])
             .catch(err => console.error('Failed to copy text:', err));
     };
+    
 
     return (
         <div id='bible'>
