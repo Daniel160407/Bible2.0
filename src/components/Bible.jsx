@@ -185,6 +185,8 @@ const Bible = () => {
                 if (bookFound) {
                     const searchedChapter = parseInt(matcher[2], 10);
                     setSelectedChapter(searchedChapter);
+                    Cookies.set('book', bookindex, {expires: 7});
+                    Cookies.set('chapter', searchedChapter, {expires: 7});
 
                     const verseIdentified = !(typeof matcher[3] === 'undefined');
 
