@@ -241,6 +241,12 @@ const Bible = () => {
         }
     };
 
+    const handleCopy = (text, path) => {
+        const copyText = `${text}\n${path}`;
+        navigator.clipboard.writeText(copyText)
+            .catch(err => console.error('Failed to copy text:', err));
+    };
+
     return (
         <div id='bible'>
             <div className='searchPanel'>
@@ -282,18 +288,20 @@ const Bible = () => {
                     placeholder="Search verses..."
                 />
             </div>
-            <div id='content'>
+            <div id="content">
                 {loading && <div className="loader"></div>}
-                <h1 id='title'>{selectedBook}</h1>
-                {verses.some(v => v.searched) && (
-                    <p>{results} Results found</p>
-                )}
-                {verses.map(verse => (
-                    <div id={`verse${verse.id}`} key={verse.id} className={`verse ${verse.searched ? 'searched' : ''}`}>
-                        <h1 className='verse-text' dangerouslySetInnerHTML={{ __html: verse.bv }} />
-                        <h1 className='verse-reference'>{verse.searched ? books[parseInt(verse.wigni) + 2] : selectedBook} {verse.tavi}:{verse.muxli}</h1>
-                    </div>
-                ))}
+                <h1 id="title">{selectedBook}</h1>
+                {verses.map(verse => {
+                    const verseText = verse.bv.replace(/(<([^>]+)>)/gi, '');
+                    const versePath = `${verse.searched ? books[parseInt(verse.wigni) + 2] : selectedBook} ${verse.tavi}:${verse.muxli}`;
+                    return (
+                        <div id={`verse${verse.id}`} key={verse.id} className={`verse ${verse.searched ? 'searched' : ''}`}>
+                            <h1 className="verse-text" dangerouslySetInnerHTML={{ __html: verse.bv }} />
+                            <h1 className="verse-reference">{versePath}</h1>
+                            <img src='/images/copy.png' onClick={() => handleCopy(verseText, versePath)}></img>
+                        </div>
+                    );
+                })}
             </div>
             <div className='controlls'>
                 <button onClick={handleNextButtonClick}>Next Chapter</button>
