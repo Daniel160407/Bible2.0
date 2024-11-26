@@ -102,6 +102,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                         if (languages[i].checked){
                             setShow(true);
                             setClear(false);
+                            break;
                         }
                     }
                 }}>Show</button>
