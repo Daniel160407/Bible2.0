@@ -305,6 +305,9 @@ const Bible = () => {
             <div id="content">
                 {loading && <div className="loader"></div>}
                 <h1 id="title">{selectedBook}</h1>
+                {verses.some(v => v.searched) && (
+                    <p>{results} Results found</p>
+                )}
                 {verses.map(verse => {
                     const verseText = verse.bv.replace(/(<([^>]+)>)/gi, '');
                     const versePath = `${verse.searched ? books[parseInt(verse.wigni) + 2] : selectedBook} ${verse.tavi}:${verse.muxli}`;
