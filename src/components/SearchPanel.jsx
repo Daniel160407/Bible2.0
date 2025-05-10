@@ -27,9 +27,42 @@ const SearchPanel = ({
   const [newCustomer, setNewCustomer] = useState(
     Cookies.get("newCustomer") || true
   );
+  const [showMessage, setShowMessage] = useState(false);
+
+  const englishBookIndexes = {
+    48: 62,
+    49: 63,
+    50: 64,
+    51: 65,
+    52: 66,
+    53: 67,
+    54: 68,
+    55: 48,
+    56: 49,
+    57: 50,
+    58: 51,
+    59: 52,
+    60: 53,
+    61: 54,
+    62: 55,
+    63: 56,
+    64: 57,
+    65: 58,
+    66: 59,
+    67: 60,
+    68: 61,
+  };
+
+  const getMappedBookIndex = (bookIndex) => {
+    if (language === "eng" && englishBookIndexes[bookIndex]) {
+      return englishBookIndexes[bookIndex];
+    }
+    return bookIndex;
+  };
 
   useEffect(() => {
     setLoading(true);
+    networkTester();
     axios
       .get(
         `https://holybible.ge/service.php?w=4&t=&m=&s=&language=${language}&page=1`
@@ -69,11 +102,29 @@ const SearchPanel = ({
       .catch((error) => {
         console.error("There was an error fetching the versions!", error);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setShowMessage(false);
+      });
   }, [language]);
+
+  const networkTester = () => {
+    if (loading === true) {
+      let seconds = 0;
+      const interval = setInterval(() => {
+        seconds++;
+
+        if (seconds >= 2) {
+          clearInterval(interval);
+          setShowMessage(true);
+        }
+      }, 1000);
+    }
+  };
 
   const handleLanguageChange = (e) => {
     setLoading(true);
+    networkTester();
     const selectedLanguage = e.target.value;
     setLanguage(selectedLanguage);
     axios
@@ -88,23 +139,30 @@ const SearchPanel = ({
       .catch((error) => {
         console.error("There was an error fetching the versions!", error);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setShowMessage(false);
+      });
   };
 
   const handleBookChange = (e) => {
     setLoading(true);
+    networkTester();
     setSelectedChapter(null);
     setSelectedVerse(null);
     setSelectedTill(null);
 
     const bookName = e.target.value;
     const bookIndex = books.indexOf(bookName) + 1;
+    const mappedBookIndex = getMappedBookIndex(bookIndex);
+
     setSelectedBook(bookName);
-    setSelectedBookIndex(bookIndex);
+    setSelectedBookIndex(mappedBookIndex);
     setBookToDisplay(bookName);
+
     axios
       .get(
-        `https://holybible.ge/service.php?w=${bookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`
+        `https://holybible.ge/service.php?w=${mappedBookIndex}&t=1&m=&s=&mv=${selectedVersion}&language=${language}&page=1`
       )
       .then((response) => {
         const data = response.data;
@@ -113,7 +171,7 @@ const SearchPanel = ({
 
         const selectedVerseData = {
           book: bookName,
-          bookIndex: bookIndex,
+          bookIndex: mappedBookIndex,
           chapter: 1,
           verse: 1,
           till: null,
@@ -125,19 +183,26 @@ const SearchPanel = ({
       .catch((error) => {
         console.error("There was an error fetching the versions!", error);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setShowMessage(false);
+      });
   };
 
   const handleChapterChange = (e) => {
     setLoading(true);
+    networkTester();
     setSelectedVerse(null);
     setSelectedTill(null);
 
     const chapter = e.target.value;
     setSelectedChapter(chapter);
+
+    const mappedBookIndex = getMappedBookIndex(selectedBookIndex);
+
     axios
       .get(
-        `https://holybible.ge/service.php?w=${selectedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`
+        `https://holybible.ge/service.php?w=${mappedBookIndex}&t=${chapter}&m=&s=&mv=${selectedVersion}&language=${language}&page=1`
       )
       .then((response) => {
         const data = response.data;
@@ -146,7 +211,7 @@ const SearchPanel = ({
 
           const selectedVerseData = {
             book: selectedBook,
-            bookIndex: selectedBookIndex,
+            bookIndex: mappedBookIndex,
             chapter: chapter,
             verse: 1,
             till: null,
@@ -162,7 +227,10 @@ const SearchPanel = ({
       .catch((error) => {
         console.error("There was an error fetching the chapters!", error);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setShowMessage(false);
+      });
   };
 
   const handleVerseChange = (e) => {
@@ -179,7 +247,6 @@ const SearchPanel = ({
     setSelectedVerseIndex(verseIndex);
 
     if (verses && verses.length > verseIndex) {
-      console.log(selectedChapter);
       const selectedVerseData = {
         book: selectedBook,
         bookIndex: selectedBookIndex,
@@ -217,8 +284,9 @@ const SearchPanel = ({
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && e.target.value !== "" && e.target.value !== " ") {
       setLoading(true);
+      networkTester();
       setSeperatedVerse(null);
       const pattern = /(\d?\D+?) (\d+):(\d+)(?:-(\d+))?/;
       const matcher = searchText.match(pattern);
@@ -233,7 +301,8 @@ const SearchPanel = ({
           if (books[i].toLowerCase().startsWith(searchedBook.toLowerCase())) {
             setSelectedBook(books[i]);
             bookindex = i + 1;
-            setSelectedBookIndex(bookindex);
+            const mappedBookIndex = getMappedBookIndex(bookindex);
+            setSelectedBookIndex(mappedBookIndex);
             setBookToDisplay(books[i]);
             bookFound = true;
             break;
@@ -280,7 +349,10 @@ const SearchPanel = ({
             .catch((error) => {
               console.error("There was an error fetching the chapters!", error);
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+              setLoading(false);
+              setShowMessage(false);
+            });
         } else {
           console.error("Book not found");
         }
@@ -321,7 +393,10 @@ const SearchPanel = ({
             .catch((error) =>
               console.error("Error fetching search results:", error)
             )
-            .finally(() => setLoading(false));
+            .finally(() => {
+              setLoading(false);
+              setShowMessage(false);
+            });
         } else {
           axios
             .get(
@@ -340,7 +415,10 @@ const SearchPanel = ({
               };
               setVersesToDisplay(versesToDisplay);
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+              setLoading(false);
+              setShowMessage(false);
+            });
         }
       }
     }
@@ -359,11 +437,17 @@ const SearchPanel = ({
   };
 
   const handleLeftArrowClick = () => {
-    handleVerseChange(parseInt(selectedVerse > 0 ? selectedVerse : selectedVerse + 1) - 1);
+    handleVerseChange(
+      parseInt(selectedVerse > 0 ? selectedVerse : selectedVerse + 1) - 1
+    );
   };
 
   const handleRightArrowClick = () => {
-    handleVerseChange(parseInt(selectedVerse <= versesAmount ? selectedVerse : selectedVerse - 1) + 1);
+    handleVerseChange(
+      parseInt(
+        selectedVerse <= versesAmount ? selectedVerse : selectedVerse - 1
+      ) + 1
+    );
   };
 
   const handleFarmerClick = () => {
@@ -438,11 +522,18 @@ const SearchPanel = ({
         onKeyPress={handleKeyPress}
         onChange={(e) => setSearchText(e.target.value)}
       ></input>
-      <input
-        id="wholeBible"
-        type="checkbox"
-        onChange={() => setWholeBible(!wholeBible)}
-      ></input>
+      <div className="whole-bible-toggle">
+        <label className="wholeBibleLabel">
+          <input
+            type="checkbox"
+            checked={wholeBible}
+            onChange={(e) => setWholeBible(e.target.checked)}
+          />
+          <span className="slider"></span>
+          Search in Whole Bible
+        </label>
+      </div>
+
       <div className="arrows">
         <svg
           onClick={handleLeftArrowClick}
@@ -478,14 +569,25 @@ const SearchPanel = ({
       <button id="clearButton" onClick={onClearButtonClick}>
         Clear
       </button>
-      {loading && <div className="loader"></div>}
+      {loading && (
+        <>
+          <div className="loader"></div>
+          <div>{showMessage === true ? "Your network is low!" : ""}</div>
+        </>
+      )}
       {newCustomer === true && (
         <div onClick={handleFarmerClick} className="farmer-container">
           <div className="cloud">
             <p className="message">
               Welcome to the Bible app! Please read a{" "}
-              <a onClick={handleFarmerClick} href="/documentation" target="_blank">documentation</a>, or scroll down in
-              documentation to watch a video instruction.
+              <a
+                onClick={handleFarmerClick}
+                href="/documentation"
+                target="_blank"
+              >
+                documentation
+              </a>
+              , or scroll down in documentation to watch a video instruction.
             </p>
           </div>
           <div className="farmer">

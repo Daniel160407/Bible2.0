@@ -1,115 +1,307 @@
-.windowButtons {
+.buttons-container {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 1rem;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+}
+
+#hide {
+  cursor: pointer;
+  background: rgba(26, 37, 56, 0.8);
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(26, 37, 56, 1);
+  }
+  
+  #hideButton {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.windowButtons {
   background-color: #1a2538;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 500px;
   overflow: hidden;
-  transition: height 0.3s ease;
+  position: relative;
 
   &.hidden {
-    height: -50px;
+    opacity: 0;
+    transform: translateY(20px);
+    max-height: 0;
     padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    pointer-events: none;
     gap: 0;
-  }
-
-  #hide {
-    display: flex;
-    justify-content: flex-end;
-
-    #hideButton {
-      width: 20px;
-      cursor: pointer;
-    }
   }
 
   .btns {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    transition: opacity 0.3s ease, max-height 0.5s ease;
-    max-height: 300px;
-    opacity: 1;
-    overflow: hidden;
-    padding: 15px;
-
-    &.hidden {
-      display: none;
-      max-height: 0;
-      opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      gap: 0;
+    justify-content: center;
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+      
+      &:active {
+        transform: scale(1);
+      }
+    }
+    
+    .documentationBtn {
+      background-color: #007bff;
+      
+      &:hover {
+        background-color: #0056b3;
+      }
+      
+      &:active {
+        background-color: #004494;
+      }
+    }
+    
+    .bibleBtn {
+      background-color: #28a745;
+      
+      &:hover {
+        background-color: #218838;
+      }
+      
+      &:active {
+        background-color: #1e7e34;
+      }
+    }
+    
+    .donate-btn {
+      background: #ff6b6b;
+      
+      &:hover {
+        background: #ff4444;
+      }
     }
   }
 
   .madeBy {
     color: #f4f4f4;
     text-align: center;
-
+    font-size: 0.9rem;
+    
     a {
       color: #f4f4f4;
       text-decoration: underline;
       padding: 0px;
     }
+    
     .redHeart {
       color: red;
+    }
   }
+}
+
+.present-view-alert {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4444;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  animation: fadeInOut 3s forwards;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.donation-modal {
+  background: #1a2538;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #f4f4f4;
+
+  h3 {
+    margin-top: 0;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 1.5rem;
   }
 
-  .documentationBtn,
-  .bibleBtn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    color: #ffffff;
-    background-color: #007bff;
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
     border: none;
-    border-radius: 5px;
+    color: #fff;
+    font-size: 1.5rem;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    line-height: 1;
+  }
 
-    &:hover {
-      background-color: #0056b3;
-      transform: scale(1.05);
-    }
+  .donation-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #2d3a50;
 
-    &:active {
-      background-color: #004494;
-      transform: scale(1);
-    }
+    .tab-btn {
+      flex: 1;
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      color: #f4f4f4;
+      cursor: pointer;
+      position: relative;
+      font-weight: 500;
 
-    &:nth-child(2) {
-      background-color: #28a745;
+      &.active {
+        color: #4CAF50;
 
-      &:hover {
-        background-color: #218838;
-      }
-
-      &:active {
-        background-color: #1e7e34;
-      }
-    }
-
-    &:nth-child(3) {
-      background-color: #dc3545;
-
-      &:hover {
-        background-color: #c82333;
-      }
-
-      &:active {
-        background-color: #bd2130;
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: #4CAF50;
+        }
       }
     }
+  }
+
+  .donation-content {
+    .bank-details {
+      h4 {
+        margin-top: 0;
+        color: #4CAF50;
+        text-align: center;
+      }
+
+      .bank-info {
+        margin: 1.5rem 0;
+        p {
+          margin: 0.8rem 0;
+          strong {
+            color: #4CAF50;
+          }
+        }
+      }
+
+      .copy-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 1rem;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background: #0056b3;
+        }
+      }
+    }
+
+    .donationalerts-option {
+      text-align: center;
+      
+      h4 {
+        color: #ff6b6b;
+        margin-top: 0;
+      }
+
+      p {
+        margin-bottom: 1.5rem;
+      }
+
+      .donate-link-btn {
+        display: inline-block;
+        background: #ff6b6b;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background: #ff4444;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
   }
 }
 

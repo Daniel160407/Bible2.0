@@ -27,6 +27,12 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
   const [background, setBackground] = useState("/backgrounds/16.jpeg");
 
+  const englishBookIndexes = {
+    48: 62, 49: 63, 50: 64, 51: 65, 52: 66, 53: 67, 54: 68,
+    55: 48, 56: 49, 57: 50, 58: 51, 59: 52, 60: 53, 61: 54,
+    62: 55, 63: 56, 64: 57, 65: 58, 66: 59, 67: 60, 68: 61,
+  };
+
   useEffect(() => {
     const fetchBooks = async (language, setBooks) => {
       try {
@@ -39,14 +45,18 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
       }
     };
 
-    fetchBooks("geo", setGeoBooks);
-    fetchBooks("eng", setEngBooks);
-    fetchBooks("russian", setRusBooks);
-    fetchBooks("ukrainian", setUaBooks);
-    fetchBooks("french", setFrBooks);
-    fetchBooks("greek", setGrBooks);
-    fetchBooks("turkish", setTrBooks);
-    fetchBooks("spanish", setEsBooks);
+    const languagesToFetch = [
+      { language: "geo", setter: setGeoBooks },
+      { language: "eng", setter: setEngBooks },
+      { language: "russian", setter: setRusBooks },
+      { language: "ukrainian", setter: setUaBooks },
+      { language: "french", setter: setFrBooks },
+      { language: "greek", setter: setGrBooks },
+      { language: "turkish", setter: setTrBooks },
+      { language: "spanish", setter: setEsBooks },
+    ];
+
+    languagesToFetch.forEach(({ language, setter }) => fetchBooks(language, setter));
   }, []);
 
   useEffect(() => {
@@ -65,108 +75,54 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
     channel.postMessage({ background });
   }, [background]);
 
-  const englishBookIndexes = {
-    48: 62,
-    49: 63,
-    50: 64,
-    51: 65,
-    52: 66,
-    53: 67,
-    54: 68,
-    55: 48,
-    56: 49,
-    57: 50,
-    58: 51,
-    59: 52,
-    60: 53,
-    61: 54,
-    62: 55,
-    63: 56,
-    64: 57,
-    65: 58,
-    66: 59,
-    67: 60,
-    68: 61,
-  };
-
   useEffect(() => {
     if (show) {
       const fetchVerses = async (language, version, books, setVerses) => {
-        console.log(language);
-        let originalBookIndex = versesToDisplay.bookIndex;
+        const originalBookIndex = versesToDisplay.bookIndex;
 
         if (language === "eng" && englishBookIndexes[versesToDisplay.bookIndex]) {
-          versesToDisplay.bookIndex =
-            englishBookIndexes[versesToDisplay.bookIndex];
+          versesToDisplay.bookIndex = englishBookIndexes[versesToDisplay.bookIndex];
         }
 
         try {
-            let bibleData;
-          await axios
-            .get(
-              `https://holybible.ge/service.php?
-                        w=${
-                          separatedVerse
-                            ? versesToDisplay.bookIndex + 1
-                            : versesToDisplay.bookIndex
-                        }
-                        &t=${
-                          separatedVerse
-                            ? separatedVerse.tavi
-                            : versesToDisplay.chapter
-                        }&m=&s=
-                        &mv=${version}&language=${language}&page=1`
-            )
-            .then((response) => {
-              versesToDisplay.bookIndex = originalBookIndex;
-              bibleData = response.data.bibleData;
-            });
-          let bv = [];
+          const response = await axios.get(
+            `https://holybible.ge/service.php?w=${
+              separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex
+            }&t=${
+              separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter
+            }&m=&s=&mv=${version}&language=${language}&page=1`
+          );
+
+          const bibleData = response.data.bibleData;
+          const bv = [];
 
           if (!separatedVerse) {
-            if (versesToDisplay.till !== null) {
-              for (
-                let i = versesToDisplay.verse - 1;
-                i <= versesToDisplay.till - 1;
-                i++
-              ) {
-                bv.push(bibleData[i]);
-              }
-            } else {
-              bv.push(bibleData[versesToDisplay.verse - 1]);
-            }
-            if (language === 'eng' && englishBookIndexes[versesToDisplay.bookIndex]) {
-                versesToDisplay.bookIndex = englishBookIndexes[versesToDisplay.bookIndex];
-            }
-            setVerses({
-              book: books[versesToDisplay.bookIndex - 1],
-              chapter: versesToDisplay.chapter,
-              verse: versesToDisplay.verse,
-              till: versesToDisplay.till,
-              bv,
-            });
-            if (language === 'eng') {
-                versesToDisplay.bookIndex = originalBookIndex;
+            const start = versesToDisplay.verse - 1;
+            const end = versesToDisplay.till !== null ? versesToDisplay.till - 1 : start;
+            for (let i = start; i <= end; i++) {
+              bv.push(bibleData[i]);
             }
           } else {
-            for (let i = 0; i < bibleData.length; i++) {
-              if (
-                bibleData[i].tavi === separatedVerse.tavi &&
-                bibleData[i].muxli === separatedVerse.muxli
-              ) {
-                bv.push(bibleData[i]);
+            for (const verse of bibleData) {
+              if (verse.tavi === separatedVerse.tavi && verse.muxli === separatedVerse.muxli) {
+                bv.push(verse);
               }
             }
-            setVerses({
-              book: books[versesToDisplay.bookIndex],
-              chapter: separatedVerse.tavi,
-              verse: separatedVerse.muxli,
-              till: null,
-              bv,
-            });
           }
+
+          setVerses({
+            book: books[versesToDisplay.bookIndex - (separatedVerse ? 0 : 1)],
+            chapter: separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter,
+            verse: separatedVerse ? separatedVerse.muxli : versesToDisplay.verse,
+            till: separatedVerse ? null : versesToDisplay.till,
+            bv,
+          });
         } catch (error) {
           console.error(`Failed to fetch ${language} verses`, error);
+        } finally {
+          if (language === "eng") {
+            versesToDisplay.bookIndex = originalBookIndex;
+          }
         }
       };
 
@@ -177,38 +133,22 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
         setShow(false);
       };
 
-      languages.geo &&
-        fetchVerses("geo", versions.geo, geoBooks, (data) =>
-          setVerses("geo", data)
-        );
-      languages.eng &&
-        fetchVerses("eng", versions.eng, engBooks, (data) =>
-          setVerses("eng", data)
-        );
-      languages.rus &&
-        fetchVerses("russian", versions.rus, rusBooks, (data) =>
-          setVerses("rus", data)
-        );
-      languages.ua &&
-        fetchVerses("ukrainian", versions.ua, uaBooks, (data) =>
-          setVerses("ua", data)
-        );
-      languages.fr &&
-        fetchVerses("french", versions.fr, frBooks, (data) =>
-          setVerses("fr", data)
-        );
-      languages.gr &&
-        fetchVerses("greek", versions.gr, grBooks, (data) =>
-          setVerses("gr", data)
-        );
-      languages.tr &&
-        fetchVerses("turkish", versions.tr, trBooks, (data) =>
-          setVerses("tr", data)
-        );
-      languages.es &&
-        fetchVerses("spanish", versions.es, esBooks, (data) =>
-          setVerses("es", data)
-        );
+      Object.entries(languages).forEach(([lang, isSelected]) => {
+        if (isSelected && versions[lang]) {
+          const books = {
+            geo: geoBooks,
+            eng: engBooks,
+            russian: rusBooks,
+            ukrainian: uaBooks,
+            french: frBooks,
+            greek: grBooks,
+            turkish: trBooks,
+            spanish: esBooks,
+          }[lang];
+
+          fetchVerses(lang, versions[lang], books, (data) => setVerses(lang, data));
+        }
+      });
     }
   }, [show]);
 

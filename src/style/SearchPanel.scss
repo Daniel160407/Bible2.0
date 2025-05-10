@@ -34,7 +34,9 @@ $select-padding: 0.5rem;
       box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
-    &#chapters, &#verses, &#till {
+    &#chapters,
+    &#verses,
+    &#till {
       width: 60px;
     }
 
@@ -83,19 +85,61 @@ $select-padding: 0.5rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
     background-color: #dc3545;
-  
+
     &:hover {
       background-color: #c82333;
       box-shadow: 0 4px 8px rgba(25, 48, 182, 0.5);
     }
   }
 
-  #wholeBible {
-    margin-right: 1rem;
-    accent-color: #007bff;
-    transform: scale(1.5);
-    margin: 0.5rem;
-    cursor: pointer;
+  .whole-bible-toggle {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+
+    .wholeBibleLabel {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: white;
+      gap: 0.5rem;
+      position: relative;
+
+      input {
+        display: none;
+      }
+
+      .slider {
+        width: 40px;
+        height: 20px;
+        background-color: #ccc;
+        border-radius: 20px;
+        position: relative;
+        transition: 0.4s;
+
+        &::before {
+          content: "";
+          position: absolute;
+          height: 16px;
+          width: 16px;
+          border-radius: 50%;
+          background-color: white;
+          left: 2px;
+          top: 2px;
+          transition: 0.4s;
+        }
+      }
+
+      input:checked + .slider {
+        background-color: #4caf50;
+
+        &::before {
+          transform: translateX(20px);
+        }
+      }
+    }
   }
 
   .loader {
@@ -105,7 +149,13 @@ $select-padding: 0.5rem;
     width: 65px;
     z-index: 1000;
     aspect-ratio: 1;
-    --g: radial-gradient(farthest-side, #0000 calc(95% - 3px), #fff calc(100% - 3px) 98%, #0000 101%) no-repeat;
+    --g: radial-gradient(
+        farthest-side,
+        #0000 calc(95% - 3px),
+        #fff calc(100% - 3px) 98%,
+        #0000 101%
+      )
+      no-repeat;
     background: var(--g), var(--g), var(--g);
     background-size: 30px 30px;
     transform: translate(-50%, -50%);
@@ -118,13 +168,13 @@ $select-padding: 0.5rem;
 
     .arrow {
       cursor: pointer;
-      
+
       color: #edf8ff;
       width: 30px;
       height: 30px;
     }
   }
-  
+
   .farmer-container {
     position: fixed;
     top: 40%;
@@ -135,7 +185,7 @@ $select-padding: 0.5rem;
     height: 100px;
     text-align: center;
     cursor: pointer;
-  
+
     .cloud {
       position: absolute;
       top: -40px;
@@ -146,9 +196,9 @@ $select-padding: 0.5rem;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
       padding: 20px;
       width: 200px;
-  
+
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: -15px;
         left: 50%;
@@ -157,29 +207,29 @@ $select-padding: 0.5rem;
         border-style: solid;
         border-color: #ffffff transparent transparent transparent;
       }
-  
+
       .message {
-        font-family: 'Comic Sans MS', cursive;
+        font-family: "Comic Sans MS", cursive;
         font-size: 14px;
         color: #333;
       }
     }
-  
+
     .farmer {
       position: relative;
       margin-top: 90px;
-  
+
       .hat {
         width: 80px;
         height: 20px;
-        background: #8B4513;
+        background: #8b4513;
         border-radius: 50% / 100% 100% 0 0;
         position: absolute;
         top: 0;
         left: 50%;
         transform: translateX(-50%);
       }
-  
+
       .body {
         width: 60px;
         height: 100px;
@@ -190,28 +240,28 @@ $select-padding: 0.5rem;
         transform: translateX(-50%);
         border-radius: 0 0 10px 10px;
       }
-  
+
       .legs {
         width: 10px;
         height: 60px;
-        background: #8B4513;
+        background: #8b4513;
         position: absolute;
         top: 120px;
         left: 50%;
         transform: translateX(-50%);
       }
-  
+
       .arms {
         width: 20px;
         height: 70px;
-        background: #8B4513;
+        background: #8b4513;
         position: absolute;
         top: 40px;
         left: 50%;
         transform: translateX(-50%);
         border-radius: 10px;
       }
-  
+
       .face {
         position: absolute;
         top: 20px;
@@ -219,9 +269,9 @@ $select-padding: 0.5rem;
         transform: translateX(-50%);
         width: 40px;
         height: 40px;
-        background: #FFDBAC;
+        background: #ffdbac;
         border-radius: 50%;
-        
+
         .eyes {
           position: absolute;
           top: 10px;
@@ -231,18 +281,17 @@ $select-padding: 0.5rem;
           background: #000;
           border-radius: 50%;
         }
-  
+
         .mouth {
           position: absolute;
           top: 25px;
           left: 12px;
           width: 16px;
           height: 5px;
-          background: #FF6347;
+          background: #ff6347;
           border-radius: 50%;
         }
       }
     }
   }
-  
 }

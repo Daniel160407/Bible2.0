@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import SearchPanel from "./components/SearchPanel";
 import Verses from "./components/Verses";
 import Controller from "./components/control/Controller";
-import Cookies from "js-cookie";
 
 const App = () => {
   const [versesToDisplay, setVersesToDisplay] = useState({

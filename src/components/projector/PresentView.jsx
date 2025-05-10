@@ -27,7 +27,6 @@ const PresentView = () => {
                     if (!data.versesToDisplay) {
                         setFontSize(data.fontSize);
                     } else {
-                        console.log(data.versesToDisplay)
                         setVersesToDisplay(data.versesToDisplay || []);
                         setShow(data.show);
                         setFontSize(data.fontSize);
