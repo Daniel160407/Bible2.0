@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import '../../style/ProjectorController.scss';
 
-const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize, setFont, font, setTextColor, textColor }) => {
+const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, setFontSize, fontSize, setFont, font, setTextColor, textColor, textPos, setTextPos }) => {
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
@@ -111,6 +111,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                     setShow(false);
                 }}>Clear</button>
             </div>
+            <p>Text decorations</p>
             <div className="selection">
                 <label htmlFor="font-size">Font Size:</label>
                 <select id="font-size" value={fontSize} onChange={(e) => setFontSize(e.target.value)}>
@@ -145,6 +146,15 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                     <option style={{color: '#ea1f36'}} value='#ea1f36'>Red</option>
                 </select>
             </div>
+            <div className="selection">
+                <label htmlFor="textPos">Text Position:</label>
+                <select id="textPos" value={textPos} onChange={(e) => setTextPos(e.target.value)}>
+                    <option value={"left"}>Left</option>
+                    <option value={"center"}>Center</option>
+                    <option value={"right"}>Right</option>
+                </select>
+            </div>
+            <p>Languages to display</p>
             {[
                 { langKey: 'geo', label: 'Georgian', versions: geoVersions, selectedVersion: selectedGeoVersion, setSelectedVersion: setSelectedGeoVersion },
                 { langKey: 'eng', label: 'English', versions: engVersions, selectedVersion: selectedEngVersion, setSelectedVersion: setSelectedEngVersion },

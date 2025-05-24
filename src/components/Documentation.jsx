@@ -3,6 +3,11 @@ import "../style/Documentation.scss";
 
 const Documentation = () => {
   const [language, setLanguage] = useState("geo");
+  const url = {
+    geo: "https://youtu.be/3O34v4cyKt4",
+    eng: "https://youtu.be/m0mi9xZS9Hs",
+    rus: "https://youtu.be/McG8s4D3aH8",
+  };
 
   return (
     <div id="documentation">
@@ -66,7 +71,10 @@ const Documentation = () => {
             დაბლა, პანელში დაინახავ ღილაკს "Open Present View" დააჭირე და
             გადაგიყვანს ახალ ტაბზე. ეს გვერდი უნდა აჩვენო პროექტორზე. იმისათვის
             რომ ბრაუზერის ზედა მხარე არ გამოჩნდეს თუ ვინდოუსზე ხარ დააჭირე
-            F11-ს. <span className="redText">Present View უნდა გახსნათ მხოლოდ ერთხელ!</span>
+            F11-ს.{" "}
+            <span className="redText">
+              Present View უნდა გახსნათ მხოლოდ ერთხელ!
+            </span>
           </p>
           <br />
           <p>
@@ -159,7 +167,10 @@ const Documentation = () => {
             In the bottom panel, you will see a button "Open Present View".
             Click it, and it will take you to a new tab. This page should be
             shown on the projector. To hide the browser's top bar, if you are on
-            Windows, press F11. <span className="redText">Present View must be opened only once!</span>
+            Windows, press F11.{" "}
+            <span className="redText">
+              Present View must be opened only once!
+            </span>
           </p>
           <br />
           <p>
@@ -247,7 +258,10 @@ const Documentation = () => {
           <p>
             На нижней панели нажмите кнопку "Open Present View", чтобы открыть
             новую вкладку. Эта страница будет отображаться на проекторе. Чтобы
-            скрыть верхнюю панель браузера в Windows, нажмите F11. <span className="redText">Present View необходимо открывать только один раз!</span>
+            скрыть верхнюю панель браузера в Windows, нажмите F11.{" "}
+            <span className="redText">
+              Present View необходимо открывать только один раз!
+            </span>
           </p>
           <br />
           <p>
@@ -275,7 +289,7 @@ const Documentation = () => {
             <a href="https://t.me/Daniel170407" target="_blank">
               <p>Telegram</p>
             </a>
-            <a href="https://youtu.be/3O34v4cyKt4" target="_blank">
+            <a href={url[language]} target="_blank" rel="noopener noreferrer">
               <p>YouTube</p>
             </a>
           </div>

@@ -1,112 +1,187 @@
-@import '../style/Fonts.scss';
+@import "../style/Fonts.scss";
+
+// Variables
+$primary-color: #28a745;
+$danger-color: #dc3545;
+$background-dark: #172131;
+$background-light: #374151;
+$text-light: #e0e0e0;
+$border-color: #444444;
+$transition-timing: 0.3s ease;
+$shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+$border-radius: 10px;
+$spacing-unit: 1rem;
 
 #control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+  justify-self: center;
+  gap: $spacing-unit;
+  padding: $spacing-unit * 2;
+  margin-top: 20px;
+  background-color: $background-dark;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+
+  #projectorController {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem;
-    padding-left: 4em;
-    margin-top: 20px;
-    background-color: #172131;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-
-    #projectorController {
-      display: flex;
-    flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 2rem;
-    padding-left: 4em;
-    margin-top: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    gap: $spacing-unit;
+    width: 100%;
 
-      .buttons {
-        display: flex;
-        gap: 10px;
-
-        button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            color: #ffffff;
-            background-color: #28a745;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-  
-            &:hover {
-                background-color: #218838;
-                box-shadow: 0 4px 8px rgba(25, 48, 182, 0.5);
-            }
-  
-            &:nth-child(2) {
-                background-color: #dc3545;
-  
-                &:hover {
-                    background-color: #c82333;
-                }
-            }
-        }
-    }
-
-    
-  
-    .selection {
-        width: 500px;
-    }
-
-    label {
-      font-size: 1rem;
-      color: #e0e0e0;
-      margin-right: 0.5rem;
-    }
-  
-    input[type="checkbox"] {
-        margin-right: 1rem;
-        accent-color: #007bff;
-        transform: scale(1.5);
-        margin: 0.5rem;
-        cursor: pointer;
-    }
-  
-    select {
+    p {
+      color: $text-light;
+      font-size: 1.2rem;
+      font-weight: 600;
       width: 100%;
-      max-width: 330px;
-      padding: 0.5rem;
-      font-size: 1rem;
-      color: #ffffff;
-      background-color: #374151;
-      border: 1px solid #444444;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      transition: border-color 0.3s ease;
-  
-      &:focus {
-        border-color: #80bdff;
-        outline: none;
+      margin: $spacing-unit 0;
+      text-decoration: none;
+
+      &::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 1px;
+        background-color: rgba($text-light, 0.2);
+        margin-top: $spacing-unit * 0.5;
       }
     }
 
-    #textColor option {
-      font-weight: bold;
-    }
-  
-    .button-container {
+    .buttons {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: 20px;
+      align-self: center;
+
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        color: #ffffff;
+        background-color: #28a745;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: #218838;
+          box-shadow: 0 4px 8px rgba(25, 48, 182, 0.5);
+        }
+
+        &:nth-child(2) {
+          background-color: #dc3545;
+
+          &:hover {
+            background-color: #c82333;
+          }
+        }
+      }
     }
-  
-    .select-container {
+
+    .selection {
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      width: 100%;
+      gap: $spacing-unit;
+      margin: $spacing-unit * 0.5 0;
+
+      label {
+        flex: 0 0 120px;
+        color: $text-light;
+        font-size: 1rem;
+      }
+
+      .languageCheckbox {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: $primary-color;
+        cursor: pointer;
+      }
+
+      select {
+        cursor: pointer;
+        flex: 1;
+        padding: $spacing-unit * 0.5;
+        font-size: 1rem;
+        color: $text-light;
+        background-color: $background-light;
+        border: 1px solid $border-color;
+        border-radius: $border-radius - 4;
+        transition: border-color $transition-timing;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+
+        &:focus {
+          outline: none;
+          border-color: lighten($primary-color, 15%);
+          box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+        }
+
+        option {
+          background-color: darken($background-light, 5%);
+          color: $text-light;
+        }
+      }
     }
+
+    #textColor {
+      option {
+        position: relative;
+        padding-left: 2rem !important;
+
+        &::before {
+          content: "";
+          position: absolute;
+          left: 0.5rem;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+          background-color: var(--color);
+        }
+
+        @each $color
+          in ("#f4f4f4", "#000000", "#2196f3", "#edc612", "#31a24c", "#ea1f36")
+        {
+          &[value="#{$color}"] {
+            --color: #{$color};
+          }
+        }
+      }
     }
-    
   }
-  
+}
+
+@media (max-width: 768px) {
+  #control {
+    padding: $spacing-unit;
+
+    #projectorController {
+      padding: $spacing-unit;
+
+      .selection {
+        flex-wrap: wrap;
+        gap: $spacing-unit * 0.5;
+
+        label {
+          flex: 0 0 100%;
+        }
+
+        select {
+          width: 100%;
+        }
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  }
+}

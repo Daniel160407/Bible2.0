@@ -15,6 +15,7 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   const [fontSize, setFontSize] = useState(7);
   const [font, setFont] = useState("Banner");
   const [textColor, setTextColor] = useState("white");
+  const [textPos, setTextPos] = useState("left");
 
   const [geoBooks, setGeoBooks] = useState([]);
   const [engBooks, setEngBooks] = useState([]);
@@ -28,9 +29,27 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   const [background, setBackground] = useState("/backgrounds/16.jpeg");
 
   const englishBookIndexes = {
-    48: 62, 49: 63, 50: 64, 51: 65, 52: 66, 53: 67, 54: 68,
-    55: 48, 56: 49, 57: 50, 58: 51, 59: 52, 60: 53, 61: 54,
-    62: 55, 63: 56, 64: 57, 65: 58, 66: 59, 67: 60, 68: 61,
+    48: 62,
+    49: 63,
+    50: 64,
+    51: 65,
+    52: 66,
+    53: 67,
+    54: 68,
+    55: 48,
+    56: 49,
+    57: 50,
+    58: 51,
+    59: 52,
+    60: 53,
+    61: 54,
+    62: 55,
+    63: 56,
+    64: 57,
+    65: 58,
+    66: 59,
+    67: 60,
+    68: 61,
   };
 
   useEffect(() => {
@@ -56,7 +75,9 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
       { language: "spanish", setter: setEsBooks },
     ];
 
-    languagesToFetch.forEach(({ language, setter }) => fetchBooks(language, setter));
+    languagesToFetch.forEach(({ language, setter }) =>
+      fetchBooks(language, setter)
+    );
   }, []);
 
   useEffect(() => {
@@ -72,6 +93,10 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   }, [textColor]);
 
   useEffect(() => {
+    channel.postMessage({ textPos });
+  }, [textPos]);
+
+  useEffect(() => {
     channel.postMessage({ background });
   }, [background]);
 
@@ -80,14 +105,20 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
       const fetchVerses = async (language, version, books, setVerses) => {
         const originalBookIndex = versesToDisplay.bookIndex;
 
-        if (language === "eng" && englishBookIndexes[versesToDisplay.bookIndex]) {
-          versesToDisplay.bookIndex = englishBookIndexes[versesToDisplay.bookIndex];
+        if (
+          language === "eng" &&
+          englishBookIndexes[versesToDisplay.bookIndex]
+        ) {
+          versesToDisplay.bookIndex =
+            englishBookIndexes[versesToDisplay.bookIndex];
         }
 
         try {
           const response = await axios.get(
             `https://holybible.ge/service.php?w=${
-              separatedVerse ? versesToDisplay.bookIndex + 1 : versesToDisplay.bookIndex
+              separatedVerse
+                ? versesToDisplay.bookIndex + 1
+                : versesToDisplay.bookIndex
             }&t=${
               separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter
             }&m=&s=&mv=${version}&language=${language}&page=1`
@@ -98,13 +129,17 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
           if (!separatedVerse) {
             const start = versesToDisplay.verse - 1;
-            const end = versesToDisplay.till !== null ? versesToDisplay.till - 1 : start;
+            const end =
+              versesToDisplay.till !== null ? versesToDisplay.till - 1 : start;
             for (let i = start; i <= end; i++) {
               bv.push(bibleData[i]);
             }
           } else {
             for (const verse of bibleData) {
-              if (verse.tavi === separatedVerse.tavi && verse.muxli === separatedVerse.muxli) {
+              if (
+                verse.tavi === separatedVerse.tavi &&
+                verse.muxli === separatedVerse.muxli
+              ) {
                 bv.push(verse);
               }
             }
@@ -112,8 +147,12 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
 
           setVerses({
             book: books[versesToDisplay.bookIndex - (separatedVerse ? 0 : 1)],
-            chapter: separatedVerse ? separatedVerse.tavi : versesToDisplay.chapter,
-            verse: separatedVerse ? separatedVerse.muxli : versesToDisplay.verse,
+            chapter: separatedVerse
+              ? separatedVerse.tavi
+              : versesToDisplay.chapter,
+            verse: separatedVerse
+              ? separatedVerse.muxli
+              : versesToDisplay.verse,
             till: separatedVerse ? null : versesToDisplay.till,
             bv,
           });
@@ -146,7 +185,9 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
             spanish: esBooks,
           }[lang];
 
-          fetchVerses(lang, versions[lang], books, (data) => setVerses(lang, data));
+          fetchVerses(lang, versions[lang], books, (data) =>
+            setVerses(lang, data)
+          );
         }
       });
     }
@@ -173,6 +214,8 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
           font={font}
           setTextColor={setTextColor}
           textColor={textColor}
+          textPos={textPos}
+          setTextPos={setTextPos}
         />
         <BackgroundController setBackground={setBackground} />
       </div>
