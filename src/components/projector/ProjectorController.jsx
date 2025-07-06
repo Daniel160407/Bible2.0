@@ -6,21 +6,10 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     const [geoVersions, setGeoVersions] = useState([]);
     const [engVersions, setEngVersions] = useState([]);
     const [rusVersions, setRusVersions] = useState([]);
-    const [uaVersions, setUaVersions] = useState([]);
-    const [frVersions, setFrVersions] = useState([]);
-    const [grVersions, setGrVersions] = useState([]);
-    const [trVersions, setTrVersions] = useState([]);
-    const [esVersions, setEsVersions] = useState([]);
 
     const [selectedGeoVersion, setSelectedGeoVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
     const [selectedEngVersion, setSelectedEngVersion] = useState('NASB New American Standard Bible');
     const [selectedRusVersion, setSelectedRusVersion] = useState('Синодальный перевод');
-    const [selectedUaVersion, setSelectedUaVersion] = useState('Іван Огієнко - 1930');
-    const [selectedFrVersion, setSelectedFrVersion] = useState('Louis Segond 1910');
-    const [selectedGrVersion, setSelectedGrVersion] = useState('Septuagint LXX');
-    const [selectedTrVersion, setSelectedTrVersion] = useState('Kutsal Kitap 1989');
-    const [selectedEsVersion, setSelectedEsVersion] = useState('Dios Habla Hoy');
-
     useEffect(() => {
         const fetchVersions = async () => {
             try {
@@ -32,21 +21,6 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
 
                 const rusResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=russian&page=1');
                 setRusVersions(rusResponse.data.versions);
-
-                const uaResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=ua&page=1');
-                setUaVersions(uaResponse.data.versions);
-
-                const frResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=fr&page=1');
-                setFrVersions(frResponse.data.versions);
-
-                const grResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=gr&page=1');
-                setGrVersions(grResponse.data.versions);
-
-                const trResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=tr&page=1');
-                setTrVersions(trResponse.data.versions);
-
-                const esResponse = await axios.get('https://holybible.ge/service.php?w=4&t=&m=&s=&language=es&page=1');
-                setEsVersions(esResponse.data.versions);
             } catch (error) {
                 console.error("Error fetching versions: ", error);
             }
@@ -58,11 +32,6 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
             geo: selectedGeoVersion,
             eng: selectedEngVersion,
             rus: selectedRusVersion,
-            ua: selectedUaVersion,
-            fr: selectedFrVersion,
-            gr: selectedGrVersion,
-            tr: selectedTrVersion,
-            es: selectedEsVersion,
         }
 
         setVersions(versions);
@@ -70,11 +39,6 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
         selectedGeoVersion, 
         selectedEngVersion, 
         selectedRusVersion, 
-        selectedUaVersion,
-        selectedFrVersion,
-        selectedGrVersion,
-        selectedTrVersion,
-        selectedEsVersion,
         setVersions
     ]);
 
@@ -159,12 +123,7 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
                 { langKey: 'geo', label: 'Georgian', versions: geoVersions, selectedVersion: selectedGeoVersion, setSelectedVersion: setSelectedGeoVersion },
                 { langKey: 'eng', label: 'English', versions: engVersions, selectedVersion: selectedEngVersion, setSelectedVersion: setSelectedEngVersion },
                 { langKey: 'rus', label: 'Russian', versions: rusVersions, selectedVersion: selectedRusVersion, setSelectedVersion: setSelectedRusVersion },
-                { langKey: 'ua', label: 'Ukrainian', versions: uaVersions, selectedVersion: selectedUaVersion, setSelectedVersion: setSelectedUaVersion },
-                { langKey: 'fr', label: 'French', versions: frVersions, selectedVersion: selectedFrVersion, setSelectedVersion: setSelectedFrVersion },
-                { langKey: 'gr', label: 'Greek', versions: grVersions, selectedVersion: selectedGrVersion, setSelectedVersion: setSelectedGrVersion },
-                { langKey: 'tr', label: 'Turkish', versions: trVersions, selectedVersion: selectedTrVersion, setSelectedVersion: setSelectedTrVersion },
-                { langKey: 'es', label: 'Spanish', versions: esVersions, selectedVersion: selectedEsVersion, setSelectedVersion: setSelectedEsVersion },
-            ].map(({ langKey, label, versions, selectedVersion, setSelectedVersion }) => (
+                ].map(({ langKey, label, versions, selectedVersion, setSelectedVersion }) => (
                 <div key={langKey} className="selection">
                     <label htmlFor={langKey}>{label}</label>
                     <input className="languageCheckbox" id={langKey} type="checkbox" onChange={(e) => handleCheckboxChange(langKey, e.target.checked)}></input>

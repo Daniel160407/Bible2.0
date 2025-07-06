@@ -84,11 +84,6 @@ const PresentView = () => {
         {renderVerses("geo")}
         {renderVerses("eng")}
         {renderVerses("rus")}
-        {renderVerses("ua")}
-        {renderVerses("fr")}
-        {renderVerses("gr")}
-        {renderVerses("tr")}
-        {renderVerses("es")}
       </div>
     </div>
   );

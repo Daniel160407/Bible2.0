@@ -20,11 +20,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   const [geoBooks, setGeoBooks] = useState([]);
   const [engBooks, setEngBooks] = useState([]);
   const [rusBooks, setRusBooks] = useState([]);
-  const [uaBooks, setUaBooks] = useState([]);
-  const [frBooks, setFrBooks] = useState([]);
-  const [grBooks, setGrBooks] = useState([]);
-  const [trBooks, setTrBooks] = useState([]);
-  const [esBooks, setEsBooks] = useState([]);
 
   const [background, setBackground] = useState("/backgrounds/16.jpeg");
 
@@ -68,11 +63,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
       { language: "geo", setter: setGeoBooks },
       { language: "eng", setter: setEngBooks },
       { language: "russian", setter: setRusBooks },
-      { language: "ukrainian", setter: setUaBooks },
-      { language: "french", setter: setFrBooks },
-      { language: "greek", setter: setGrBooks },
-      { language: "turkish", setter: setTrBooks },
-      { language: "spanish", setter: setEsBooks },
     ];
 
     languagesToFetch.forEach(({ language, setter }) =>
@@ -178,11 +168,6 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
             geo: geoBooks,
             eng: engBooks,
             russian: rusBooks,
-            ukrainian: uaBooks,
-            french: frBooks,
-            greek: grBooks,
-            turkish: trBooks,
-            spanish: esBooks,
           }[lang];
 
           fetchVerses(lang, versions[lang], books, (data) =>
