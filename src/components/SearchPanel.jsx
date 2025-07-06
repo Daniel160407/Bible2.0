@@ -358,45 +358,65 @@ const SearchPanel = ({
         }
       } else {
         if (wholeBible) {
-          const searchPromises = books
-            .slice(3)
-            .map((book, index) =>
-              axios.get(
-                `https://holybible.ge/service.php?w=${
-                  index + 4
-                }&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`
-              )
-            );
+          const booksToSearch = books.slice(3);
+          const allVerses = [];
+          const MAX_CONCURRENT_REQUESTS = 3;
+          const REQUEST_DELAY = 300;
 
-          Promise.all(searchPromises)
-            .then((results) => {
-              const allVerses = results.flatMap(
-                (result) => result.data.bibleData || []
+          const processRequests = async () => {
+            for (
+              let i = 0;
+              i < booksToSearch.length;
+              i += MAX_CONCURRENT_REQUESTS
+            ) {
+              const batch = booksToSearch.slice(i, i + MAX_CONCURRENT_REQUESTS);
+              const batchPromises = batch.map((book, idx) =>
+                axios
+                  .get(
+                    `https://holybible.ge/service.php?w=${
+                      i + idx + 4
+                    }&t=&m=&s=${searchText}&mv=${selectedVersion}&language=${language}&page=1`
+                  )
+                  .then((response) => {
+                    const verses = response.data.bibleData || [];
+                    verses.forEach((verse) => {
+                      verse.wholeBible = true;
+                      verse.book = books[parseInt(verse.wigni) + 2];
+                      verse.bookIndex = parseInt(verse.wigni) + 2;
+                    });
+                    return verses;
+                  })
+                  .catch((error) => {
+                    console.error(`Error fetching book ${book}:`, error);
+                    return [];
+                  })
               );
 
-              allVerses.forEach((verse) => {
-                verse.wholeBible = true;
-                verse.book = books[parseInt(verse.wigni) + 2];
-                verse.bookIndex = parseInt(verse.wigni) + 2;
-              });
+              const batchResults = await Promise.all(batchPromises);
+              const newVerses = batchResults.flat();
+              allVerses.push(...newVerses);
 
-              const versesToDisplay = {
+              setVersesToDisplay({
                 book: null,
                 bookIndex: null,
                 chapter: null,
                 verse: null,
                 till: null,
-                bv: allVerses,
-              };
-              setVersesToDisplay(versesToDisplay);
-            })
-            .catch((error) =>
-              console.error("Error fetching search results:", error)
-            )
-            .finally(() => {
-              setLoading(false);
-              setShowMessage(false);
-            });
+                bv: [...allVerses],
+              });
+
+              if (i + MAX_CONCURRENT_REQUESTS < booksToSearch.length) {
+                await new Promise((resolve) =>
+                  setTimeout(resolve, REQUEST_DELAY)
+                );
+              }
+            }
+
+            setLoading(false);
+            setShowMessage(false);
+          };
+
+          processRequests();
         } else {
           axios
             .get(
@@ -404,16 +424,14 @@ const SearchPanel = ({
             )
             .then((response) => {
               const data = response.data;
-
-              const versesToDisplay = {
+              setVersesToDisplay({
                 book: books[selectedBookIndex - 1],
                 bookIndex: selectedBookIndex - 1,
                 chapter: null,
                 verse: null,
                 till: null,
                 bv: data.bibleData,
-              };
-              setVersesToDisplay(versesToDisplay);
+              });
             })
             .finally(() => {
               setLoading(false);
