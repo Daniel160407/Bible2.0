@@ -10,6 +10,9 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
     const [selectedGeoVersion, setSelectedGeoVersion] = useState('ახალი გადამუშავებული გამოცემა 2015');
     const [selectedEngVersion, setSelectedEngVersion] = useState('NASB New American Standard Bible');
     const [selectedRusVersion, setSelectedRusVersion] = useState('Синодальный перевод');
+    
+    const [showError, setShowError] = useState(false);
+
     useEffect(() => {
         const fetchVersions = async () => {
             try {
@@ -57,19 +60,36 @@ const ProjectorController = ({ setShow, setClear, setVersions, setLanguages, set
         }));
     };
 
+    const handleShowClick = () => {
+        const languages = document.getElementsByClassName('languageCheckbox');
+        let anySelected = false;
+        
+        for (let i = 0; i < languages.length; i++) {
+            if (languages[i].checked) {
+                anySelected = true;
+                break;
+            }
+        }
+
+        if (!anySelected) {
+            setShowError(true);
+            return;
+        }
+
+        setShowError(false);
+        setShow(true);
+        setClear(false);
+    };
+
     return (
         <div id="projectorController">
             <div className="buttons">
-                <button onClick={() => {
-                    const languages = document.getElementsByClassName('languageCheckbox');
-                    for (let i = 0; i < languages.length; i++){
-                        if (languages[i].checked){
-                            setShow(true);
-                            setClear(false);
-                            break;
-                        }
-                    }
-                }}>Show</button>
+                <button 
+                    onClick={handleShowClick}
+                    className={showError ? "error" : ""}
+                >
+                    Show
+                </button>
                 <button onClick={() => {
                     setClear(true);
                     setShow(false);

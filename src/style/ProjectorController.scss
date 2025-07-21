@@ -1,6 +1,5 @@
 @import "../style/Fonts.scss";
 
-// Variables
 $primary-color: #28a745;
 $danger-color: #dc3545;
 $background-dark: #172131;
@@ -11,6 +10,7 @@ $transition-timing: 0.3s ease;
 $shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 $border-radius: 10px;
 $spacing-unit: 1rem;
+$error-glow: #ff0000;
 
 #control {
   display: flex;
@@ -54,27 +54,51 @@ $spacing-unit: 1rem;
       display: flex;
       gap: 20px;
       align-self: center;
+      width: 100%;
+      justify-content: center;
 
       button {
         padding: 0.5rem 1rem;
         font-size: 1rem;
         color: #ffffff;
-        background-color: #28a745;
+        background-color: $primary-color;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: all 0.3s ease;
+        min-width: 100px;
+        position: relative;
+        overflow: hidden;
 
         &:hover {
-          background-color: #218838;
+          background-color: darken($primary-color, 10%);
           box-shadow: 0 4px 8px rgba(25, 48, 182, 0.5);
         }
 
         &:nth-child(2) {
-          background-color: #dc3545;
+          background-color: $danger-color;
 
           &:hover {
-            background-color: #c82333;
+            background-color: darken($danger-color, 10%);
+          }
+        }
+
+        &.error {
+          animation: pulseError 0.5s infinite alternate;
+          box-shadow: 
+            0 0 5px $error-glow,
+            0 0 10px $error-glow;
+          
+          &::after {
+            content: "Select at least one language";
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: $error-glow;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
           }
         }
       }
@@ -159,8 +183,22 @@ $spacing-unit: 1rem;
   }
 }
 
+@keyframes pulseError {
+  0% {
+    box-shadow: 
+      0 0 5px $error-glow,
+      0 0 10px $error-glow;
+  }
+  100% {
+    box-shadow: 
+      0 0 10px $error-glow,
+      0 0 20px $error-glow;
+  }
+}
+
 @media (max-width: 768px) {
   #control {
+    width: 90%;
     padding: $spacing-unit;
 
     #projectorController {
@@ -181,6 +219,49 @@ $spacing-unit: 1rem;
 
       .buttons {
         flex-direction: column;
+        align-items: center;
+
+        button {
+          width: 100%;
+          max-width: 200px;
+          
+          &.error::after {
+            bottom: -20px;
+            font-size: 0.7rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  #control {
+    width: 95%;
+    padding: $spacing-unit * 0.5;
+
+    #projectorController {
+      .buttons {
+        button {
+          padding: 0.5rem;
+          font-size: 0.9rem;
+          
+          &.error::after {
+            bottom: -18px;
+            font-size: 0.6rem;
+          }
+        }
+      }
+
+      .selection {
+        label {
+          font-size: 0.9rem;
+        }
+
+        select {
+          font-size: 0.9rem;
+          padding: $spacing-unit * 0.3;
+        }
       }
     }
   }
