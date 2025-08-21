@@ -5,6 +5,7 @@ const PresentView = () => {
   const [versesToDisplay, setVersesToDisplay] = useState([]);
   const [show, setShow] = useState(false);
   const [fontSize, setFontSize] = useState(null);
+  const [strokeWidth, setSrokeWidth] = useState(1);
   const channel = new BroadcastChannel("projectorData");
 
   useEffect(() => {
@@ -27,6 +28,31 @@ const PresentView = () => {
             versesContainer.style.textAlign = data.textPos;
           }
         }
+      } else if (data.textStroke) {
+        const verses = document.getElementsByClassName("verse-text");
+        const refs = document.getElementsByClassName("verse-reference");
+
+        Array.from(verses).forEach((verse) => {
+          verse.style.webkitTextStroke = `${strokeWidth}px ${data.textStroke}`;
+        });
+        Array.from(refs).forEach((ref) => {
+          ref.style.webkitTextStroke = `${strokeWidth}px ${data.textStroke}`;
+        });
+      } else if (data.strokeWidth) {
+        setSrokeWidth(data.strokeWidth); // update state
+        const verses = document.getElementsByClassName("verse-text");
+        const refs = document.getElementsByClassName("verse-reference");
+
+        Array.from(verses).forEach((verse) => {
+          verse.style.webkitTextStroke = `${data.strokeWidth}px ${
+            verse.style.color || "#000"
+          }`;
+        });
+        Array.from(refs).forEach((ref) => {
+          ref.style.webkitTextStroke = `${data.strokeWidth}px ${
+            ref.style.color || "#000"
+          }`;
+        });
       } else {
         if (data.show === false) {
           setShow(false);

@@ -16,6 +16,8 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   const [font, setFont] = useState("Banner");
   const [textColor, setTextColor] = useState("white");
   const [textPos, setTextPos] = useState("left");
+  const [textStroke, setTextStroke] = useState("");
+  const [thickness, setThickness] = useState(0);
 
   const [geoBooks, setGeoBooks] = useState([]);
   const [engBooks, setEngBooks] = useState([]);
@@ -89,6 +91,14 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
   useEffect(() => {
     channel.postMessage({ background });
   }, [background]);
+
+  useEffect(() => {
+    channel.postMessage({ textStroke });
+  }, [textStroke]);
+
+  useEffect(() => {
+    channel.postMessage({ strokeWidth: thickness });
+  }, [thickness])
 
   useEffect(() => {
     if (show) {
@@ -201,6 +211,10 @@ const Controller = ({ versesToDisplay, separatedVerse }) => {
           textColor={textColor}
           textPos={textPos}
           setTextPos={setTextPos}
+          textStroke={textStroke}
+          setTextStroke={setTextStroke}
+          thickness={thickness}
+          setThickness={setThickness}
         />
         <BackgroundController setBackground={setBackground} />
       </div>

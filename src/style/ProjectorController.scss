@@ -183,6 +183,10 @@ $error-glow: #ff0000;
   }
 }
 
+.thickness-state {
+  color: white;
+}
+
 @keyframes pulseError {
   0% {
     box-shadow: 
