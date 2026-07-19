@@ -1,0 +1,16 @@
+{
+  "collapse-filter": true,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    { "query": "path:Pages", "color": { "a": 1, "rgb": 5431378 } },
+    { "query": "path:Features", "color": { "a": 1, "rgb": 15980288 } },
+    { "query": "path:\"Data & API\"", "color": { "a": 1, "rgb": 3062042 } },
+    { "query": "path:Architecture", "color": { "a": 1, "rgb": 14701138 } }
+  ],
+  "scale": 1
+}
