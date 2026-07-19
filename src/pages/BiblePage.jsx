@@ -1,0 +1,242 @@
+import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { useBibleMeta, useChapter } from '../hooks/useBibleQueries';
+import { useVerseSearch } from '../hooks/useVerseSearch';
+import { parseReference, findBook } from '../lib/parseReference';
+import {
+  FIRST_BOOK_INDEX,
+  PREVIEW_LANGUAGES,
+  bookNameForLanguage,
+  canonicalBookIndex,
+  mapBookIndexForLanguage,
+} from '../lib/constants';
+import Loader from '../components/ui/Loader';
+import MadeBy from '../components/ui/MadeBy';
+
+const COOKIE_OPTIONS = { expires: 7 };
+
+const fieldClass =
+  'm-[5px] rounded-[5px] border border-[#55677d] bg-[#3d4f5e] p-2.5 text-base text-white ' +
+  'transition-[background-color,border-color] duration-300 hover:border-[#6e8bb0] hover:bg-[#465a6b] ' +
+  'focus:border-[#8ca3c4] focus:outline-none max-md:w-full max-md:text-sm max-sm:p-2 max-sm:text-xs';
+
+const stripHtml = (html) => html.replace(/(<([^>]+)>)/gi, '');
+
+/** Standalone Bible reader: browse whole chapters, search, and copy verses. */
+const BiblePage = () => {
+  const [language, setLanguage] = useState(() => Cookies.get('language') ?? 'geo');
+  const [version, setVersion] = useState(() => Cookies.get('version') ?? '');
+  const [bookIndex, setBookIndex] = useState(() => Number(Cookies.get('book')) || FIRST_BOOK_INDEX);
+  const [chapter, setChapter] = useState(() => Number(Cookies.get('chapter')) || 1);
+  const [highlightedVerse, setHighlightedVerse] = useState(null);
+  const [searchText, setSearchText] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
+
+  const { data: meta, isFetching: metaLoading } = useBibleMeta(language);
+  const books = meta?.books ?? [];
+  const versions = meta?.versions ?? [];
+
+  const { data: chapterData, isFetching: chapterLoading } = useChapter({
+    bookIndex: mapBookIndexForLanguage(bookIndex, language),
+    chapter,
+    version,
+    language,
+  });
+
+  const { searchWholeBible, isSearching } = useVerseSearch({ language, books });
+  const loading = metaLoading || chapterLoading || isSearching;
+
+  const bookName = bookNameForLanguage(books, bookIndex, language);
+  const verses = searchResults ?? chapterData?.verses ?? [];
+
+  useEffect(() => {
+    const available = meta?.versions ?? [];
+    if (available.length > 0 && !available.includes(version)) {
+      setVersion(available[0]);
+    }
+  }, [meta, version]);
+
+  // Scroll the highlighted verse into view once its chapter is rendered.
+  useEffect(() => {
+    if (highlightedVerse == null) return;
+    document
+      .querySelector(`[data-verse="${highlightedVerse}"]`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [highlightedVerse, chapterData]);
+
+  const selectPassage = ({ book = bookIndex, chapter: nextChapter = 1, verse = null }) => {
+    setSearchResults(null);
+    setBookIndex(book);
+    setChapter(nextChapter);
+    setHighlightedVerse(verse);
+    Cookies.set('book', book, COOKIE_OPTIONS);
+    Cookies.set('chapter', nextChapter, COOKIE_OPTIONS);
+  };
+
+  const handleLanguageChange = (e) => {
+    setLanguage(e.target.value);
+    setSearchResults(null);
+    Cookies.remove('version');
+    Cookies.set('language', e.target.value, COOKIE_OPTIONS);
+  };
+
+  const handleVersionChange = (e) => {
+    setVersion(e.target.value);
+    Cookies.set('version', e.target.value, COOKIE_OPTIONS);
+  };
+
+  const handleBookChange = (e) => {
+    const listIndex = books.indexOf(e.target.value) + 1;
+    selectPassage({ book: canonicalBookIndex(listIndex, language) });
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key !== 'Enter' || searchText.trim() === '') return;
+
+    const reference = parseReference(searchText);
+    const book = reference && findBook(books, reference.bookQuery);
+    if (book) {
+      selectPassage({
+        book: canonicalBookIndex(book.bookIndex, language),
+        chapter: reference.chapter,
+        verse: reference.verse,
+      });
+      return;
+    }
+
+    setHighlightedVerse(null);
+    searchWholeBible({ text: searchText, version, onResults: setSearchResults });
+  };
+
+  const handleCopy = (verse) => {
+    const text = stripHtml(verse.bv);
+    const path = `${verse.book ?? bookName} ${verse.tavi}:${verse.muxli}`;
+    const html = `
+      <div style="font-family: Arial, sans-serif;">
+        <p style="margin: 10px 0; font-size: 14px;">"${text}"</p>
+        <p style="margin: 0; font-size: 18px; font-weight: bold;">${path}</p>
+      </div>
+    `;
+    navigator.clipboard
+      .write([
+        new ClipboardItem({
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([`${text}\n${path}`], { type: 'text/plain' }),
+        }),
+      ])
+      .catch((error) => console.error('Failed to copy text:', error));
+  };
+
+  return (
+    <div className="rounded-[10px] bg-panel p-5 text-white">
+      <div className="mb-5 flex flex-wrap items-center max-md:flex-col max-md:items-stretch">
+        <select className={`${fieldClass} w-[200px]`} value={language} onChange={handleLanguageChange}>
+          {PREVIEW_LANGUAGES.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <select className={`${fieldClass} w-[200px]`} value={version} onChange={handleVersionChange}>
+          {versions.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
+        <select className={`${fieldClass} w-[200px]`} value={bookName} onChange={handleBookChange}>
+          {books.slice(FIRST_BOOK_INDEX - 1).map((book) => (
+            <option key={book} value={book}>
+              {book}
+            </option>
+          ))}
+        </select>
+        <select
+          className={`${fieldClass} w-[200px]`}
+          value={chapter}
+          onChange={(e) => selectPassage({ chapter: Number(e.target.value) })}
+        >
+          {Array.from({ length: chapterData?.chapterCount ?? 0 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}
+            </option>
+          ))}
+        </select>
+        <select
+          className={`${fieldClass} w-[200px]`}
+          value={highlightedVerse ?? ''}
+          onChange={(e) => setHighlightedVerse(Number(e.target.value))}
+        >
+          <option value="" disabled hidden />
+          {Array.from({ length: chapterData?.verseCount ?? 0 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {i + 1}
+            </option>
+          ))}
+        </select>
+        <input
+          className={`${fieldClass} max-w-[150px] placeholder:italic placeholder:text-[#b0b0b0] focus:shadow-[0_0_8px_#6e8bb0]`}
+          type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onKeyDown={handleSearchKeyDown}
+          placeholder="Search verses..."
+        />
+      </div>
+
+      <div>
+        {loading && <Loader />}
+        <h1 className="my-[0.67em] text-center text-[2em] font-bold text-accent">{bookName}</h1>
+        {searchResults && <p>{searchResults.length} Results found</p>}
+        {verses.map((verse) => {
+          const isHighlighted = !searchResults && Number(verse.muxli) === highlightedVerse;
+          return (
+            <div
+              key={verse.id}
+              data-verse={verse.muxli}
+              className={`group relative mb-[15px] animate-fade-in-up rounded-lg border p-[15px]
+                transition-[transform,box-shadow,background-color] duration-300
+                hover:-translate-y-[5px] hover:shadow-[0_6px_12px_rgba(0,0,0,0.4)]
+                max-sm:p-2.5 ${
+                  isHighlighted ? 'border-card-active bg-card-active' : 'border-card bg-card'
+                }`}
+            >
+              <h1
+                className="mb-2.5 text-lg font-bold max-md:text-base max-sm:text-sm"
+                dangerouslySetInnerHTML={{ __html: verse.bv }}
+              />
+              <h1 className="text-base font-bold text-[#b2b2b2] max-md:text-sm max-sm:text-xs">
+                {verse.book ?? bookName} {verse.tavi}:{verse.muxli}
+              </h1>
+              <img
+                src="/images/copy.png"
+                alt="Copy"
+                onClick={() => handleCopy(verse)}
+                className="invisible absolute bottom-2.5 right-2.5 h-6 w-6 cursor-pointer opacity-0
+                  transition-[opacity,visibility,transform] duration-300 hover:scale-[1.2]
+                  group-hover:visible group-hover:opacity-100"
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 flex justify-center">
+        <button
+          onClick={() => selectPassage({ chapter: chapter + 1 })}
+          className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
+            transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
+            focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]"
+        >
+          Next Chapter
+        </button>
+      </div>
+
+      <div className="mt-4">
+        <MadeBy href="https://portfoliodanielabulashvili.netlify.app/" />
+      </div>
+    </div>
+  );
+};
+
+export default BiblePage;

@@ -1,36 +1,20 @@
-import { useEffect, useState } from "react";
-import SearchPanel from "./components/SearchPanel";
-import Verses from "./components/Verses";
-import Controller from "./components/control/Controller";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import AdminPage from './pages/AdminPage';
+import PresentViewPage from './pages/PresentViewPage';
+import BiblePage from './pages/BiblePage';
+import DocumentationPage from './pages/DocumentationPage';
+import DonationPage from './pages/DonationPage';
 
-const App = () => {
-  const [versesToDisplay, setVersesToDisplay] = useState({
-    bv: [],
-    book: "",
-    verse: 0,
-    chapter: 0,
-  });
-  const [bookToDisplay, setBookToDisplay] = useState("");
-  const [separatedVerse, setSeparatedVerse] = useState(null);
-
-  return (
-    <>
-      <SearchPanel
-        setVersesToDisplay={setVersesToDisplay}
-        setBookToDisplay={setBookToDisplay}
-        setSeperatedVerse={setSeparatedVerse}
-      />
-      <Verses
-        versesToDisplay={versesToDisplay}
-        setVersesToDisplay={setVersesToDisplay}
-        setSeparatedProjectorVerse={setSeparatedVerse}
-      />
-      <Controller
-        versesToDisplay={versesToDisplay}
-        separatedVerse={separatedVerse}
-      />
-    </>
-  );
-};
+const App = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<AdminPage />} />
+      <Route path="/presentview" element={<PresentViewPage />} />
+      <Route path="/bible" element={<BiblePage />} />
+      <Route path="/documentation" element={<DocumentationPage />} />
+      <Route path="/donation" element={<DonationPage />} />
+    </Routes>
+  </BrowserRouter>
+);
 
 export default App;

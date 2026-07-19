@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import 'tailwindcss';
+
+@font-face {
+  font-family: Banner;
+  src: url('/fonts/bpg-banner-caps-webfont.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Valera;
+  src: url('/fonts/w8gdH283Tvk__Lua32TysjIfp8uP.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Mouldy;
+  src: url('/fonts/MouldyCheeseRegular-WyMWG.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Oswald;
+  src: url('/fonts/Oswald-VariableFont_wght.ttf') format('truetype');
+}
+
+@theme {
+  --font-banner: Banner, Valera, Mouldy, Oswald, sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+
+  /* App palette (carried over from the old SCSS) */
+  --color-surface: #101828; /* page background */
+  --color-panel: #1a2538; /* panels: search panel results, action bar */
+  --color-panel-dark: #172131; /* projector control panel */
+  --color-card: #2b3648; /* verse cards */
+  --color-card-active: #4a4a6a; /* highlighted verse */
+  --color-field: #374151; /* selects / inputs */
+  --color-accent: #ffcc00; /* headings */
+
+  --animate-fade-in-up: fade-in-up 0.5s ease-in-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --animate-slide-down: slide-down 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --animate-fade-in-out: fade-in-out 3s forwards;
+  --animate-pulse-error: pulse-error 0.5s infinite alternate;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(30px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-down {
+    from {
+      transform: translateX(-50%) translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in-out {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px);
+    }
+    10%,
+    90% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+
+  @keyframes pulse-error {
+    0% {
+      box-shadow:
+        0 0 5px #ff0000,
+        0 0 10px #ff0000;
+    }
+    100% {
+      box-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    font-family: var(--font-banner);
+  }
+}
+
+@layer components {
+  /* Spinner: three circles chasing each other (needs a CSS variable, so not inlineable) */
+  .loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 65px;
+    z-index: 1000;
+    aspect-ratio: 1;
+    --g: radial-gradient(
+        farthest-side,
+        #0000 calc(95% - 3px),
+        #fff calc(100% - 3px) 98%,
+        #0000 101%
+      )
+      no-repeat;
+    background: var(--g), var(--g), var(--g);
+    background-size: 30px 30px;
+    transform: translate(-50%, -50%);
+    animation: loader-spin 1.5s infinite;
+  }
+
+  @keyframes loader-spin {
+    0% {
+      background-position:
+        0 0,
+        0 100%,
+        100% 100%;
+    }
+    25% {
+      background-position:
+        100% 0,
+        0 100%,
+        100% 100%;
+    }
+    50% {
+      background-position:
+        100% 0,
+        0 0,
+        100% 100%;
+    }
+    75% {
+      background-position:
+        100% 0,
+        0 0,
+        0 100%;
+    }
+    100% {
+      background-position:
+        100% 100%,
+        0 0,
+        0 100%;
+    }
+  }
+
+  /* Rainbow-glow button (Donate / Open Present View) */
+  .button-85 {
+    padding: 0.6em 2em;
+    border: none;
+    outline: none;
+    color: #fff;
+    background: #111;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    user-select: none;
+    touch-action: manipulation;
+    transition:
+      background-color 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .button-85:hover {
+    transform: scale(1.05);
+  }
+
+  .button-85:active {
+    transform: scale(1);
+  }
+
+  .button-85::before {
+    content: '';
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7300,
+      #fffb00,
+      #48ff00,
+      #00ffd5,
+      #002bff,
+      #7a00ff,
+      #ff00c8,
+      #ff0000
+    );
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing-button-85 20s linear infinite;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+
+  .button-85::after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
+
+  @keyframes glowing-button-85 {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+
+  /* Select used in the projector control panel (custom chevron needs a data-uri background) */
+  .control-select {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: #e0e0e0;
+    background-color: var(--color-field);
+    border: 1px solid #444444;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+  }
+
+  .control-select:focus {
+    outline: none;
+    border-color: #48c664;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+  }
+
+  .control-select option {
+    background-color: #2c343f;
+    color: #e0e0e0;
+  }
+
+  /* Highlight markup returned inside verse HTML by the holybible.ge search API */
+  .markedText {
+    background-color: #feee72;
+    color: #000;
+    padding: 3px 5px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+}
