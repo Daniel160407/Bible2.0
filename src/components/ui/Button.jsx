@@ -77,9 +77,9 @@ const VARIANTS = {
   toggle: {
     size: 'none',
     className:
-      'rounded-full border border-white/10 bg-panel/90 px-4 py-2 text-[13px] font-medium text-white/80 ' +
-      'shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur enabled:hover:border-white/20 enabled:hover:bg-panel ' +
-      'enabled:hover:text-white focus-visible:ring-accent/70',
+      'rounded-full border border-white/10 bg-panel/80 px-4 py-2 text-[12px] font-medium tracking-wide ' +
+      'text-white/70 shadow-[0_6px_20px_-6px_rgba(0,0,0,0.8)] backdrop-blur-xl ' +
+      'enabled:hover:border-white/20 enabled:hover:bg-panel enabled:hover:text-white focus-visible:ring-accent/70',
   },
   tab: {
     size: 'none',
