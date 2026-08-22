@@ -5,8 +5,6 @@ import {
   TEXT_COLORS,
 } from '../../lib/constants';
 
-const FONT_SIZES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 const sectionTitleClass =
   "my-4 w-full text-xl font-semibold text-[#e0e0e0] after:mt-2 after:block after:h-px after:w-full after:bg-[#e0e0e0]/20 after:content-['']";
 
@@ -50,24 +48,6 @@ const ProjectorControls = ({
     </div>
 
     <p className={sectionTitleClass}>Text decorations</p>
-
-    <div className={rowClass}>
-      <label className={labelClass} htmlFor="font-size">
-        Font Size:
-      </label>
-      <select
-        id="font-size"
-        className="control-select"
-        value={style.fontSize}
-        onChange={(e) => onStyleChange({ fontSize: Number(e.target.value) })}
-      >
-        {FONT_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {size}
-          </option>
-        ))}
-      </select>
-    </div>
 
     <div className={rowClass}>
       <label className={labelClass} htmlFor="fonts">

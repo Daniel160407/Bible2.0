@@ -81,7 +81,6 @@ export const EMPTY_DISPLAY = {
 };
 
 export const DEFAULT_PROJECTOR_STYLE = {
-  fontSize: 7,
   font: 'Banner',
   textColor: '#f4f4f4',
   textAlign: 'left',
