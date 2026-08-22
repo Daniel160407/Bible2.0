@@ -31,7 +31,6 @@ const BiblePage = () => {
   const [searchText, setSearchText] = useState('');
 
   const { data: meta, isFetching: metaLoading } = useBibleMeta(language);
-  const books = meta?.books ?? [];
   const versions = meta?.versions ?? [];
 
   const { data: chapterData, isFetching: chapterLoading } = useChapter({
@@ -40,6 +39,8 @@ const BiblePage = () => {
     version,
     language,
   });
+
+  const books = meta?.books?.length ? meta.books : (chapterData?.books ?? []);
 
   const {
     run: runSearch,
@@ -119,7 +120,7 @@ const BiblePage = () => {
 
   const handleCopy = (verse) => {
     const text = stripHtml(verse.bv);
-    const path = `${verse.book ?? bookName} ${verse.tavi}:${verse.muxli}`;
+    const path = `${verse.book || bookName} ${verse.tavi}:${verse.muxli}`;
     const html = `
       <div style="font-family: Arial, sans-serif;">
         <p style="margin: 10px 0; font-size: 14px;">"${text}"</p>
@@ -197,7 +198,9 @@ const BiblePage = () => {
         {loading && <Loader />}
         <h1 className="my-[0.67em] text-center text-[2em] font-bold text-accent">{bookName}</h1>
         {searchActive &&
-          (searchResults.length > 0 ? (
+          (searchResults === null ? (
+            <p>Searching...</p>
+          ) : searchResults.length > 0 ? (
             <p>
               Page {resultPage} of {resultPageCount}
             </p>
@@ -222,7 +225,7 @@ const BiblePage = () => {
                 dangerouslySetInnerHTML={{ __html: verse.bv }}
               />
               <h1 className="text-base font-bold text-[#b2b2b2] max-md:text-sm max-sm:text-xs">
-                {verse.book ?? bookName} {verse.tavi}:{verse.muxli}
+                {verse.book || bookName} {verse.tavi}:{verse.muxli}
               </h1>
               <img
                 src="/images/copy.png"

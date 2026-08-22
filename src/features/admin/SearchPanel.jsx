@@ -26,7 +26,7 @@ const BOOK_HINT_LIMIT = 8;
 const numberOptions = (count) =>
   Array.from({ length: count }, (_, i) => ({ value: i + 1, label: String(i + 1) }));
 
-const SearchPanel = ({ onDisplayChange }) => {
+const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
   const [language, setLanguage] = useState('geo');
   const [version, setVersion] = useState('');
   const [bookIndex, setBookIndex] = useState(FIRST_BOOK_INDEX);
@@ -63,6 +63,7 @@ const SearchPanel = ({ onDisplayChange }) => {
     isActive: searchActive,
     page: resultPage,
     pageCount: resultPageCount,
+    total: resultTotal,
     hasPrev: hasPrevResults,
     hasNext: hasNextResults,
     isSearching,
@@ -91,6 +92,10 @@ const SearchPanel = ({ onDisplayChange }) => {
 
   const chapterOptions = useMemo(() => numberOptions(chapterCount), [chapterCount]);
   const verseOptions = useMemo(() => numberOptions(verseCount), [verseCount]);
+  const verseTillOptions = useMemo(
+    () => verseOptions.filter((option) => option.value >= verseFrom),
+    [verseOptions, verseFrom],
+  );
 
   useEffect(() => {
     const available = meta?.versions ?? [];
@@ -120,6 +125,14 @@ const SearchPanel = ({ onDisplayChange }) => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterData, bookIndex, chapter, verseFrom, verseTill, passageSuppressed]);
+
+  useEffect(() => {
+    if (!separatedVerse) return;
+    setBookIndex(separatedVerse.bookIndex);
+    setChapter(Number(separatedVerse.tavi));
+    setVerseFrom(Number(separatedVerse.muxli));
+    setVerseTill(null);
+  }, [separatedVerse]);
 
   useEffect(() => {
     if (searchActive) onDisplayChange({ ...EMPTY_DISPLAY, verses: searchResults });
@@ -217,9 +230,9 @@ const SearchPanel = ({ onDisplayChange }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2.5 rounded-[10px] bg-[#1f2937] p-5">
+    <div className="flex flex-wrap items-center justify-center gap-2.5 rounded-[10px] bg-[#1f2937] p-5">
       <select
-        className={`${fieldClass} cursor-pointer`}
+        className={`${fieldClass} shrink-0 cursor-pointer`}
         value={language}
         onChange={(e) => {
           clearSearch();
@@ -234,7 +247,7 @@ const SearchPanel = ({ onDisplayChange }) => {
       </select>
 
       <Combobox
-        className="w-[300px] max-w-full"
+        className="min-w-0 flex-[1.5]"
         buttonClassName={fieldClass}
         ariaLabel="Version"
         value={version}
@@ -243,7 +256,7 @@ const SearchPanel = ({ onDisplayChange }) => {
       />
 
       <Combobox
-        className="w-[180px] max-w-full"
+        className="min-w-0 flex-1"
         buttonClassName={fieldClass}
         ariaLabel="Book"
         value={bookNameForLanguage(books, bookIndex, language)}
@@ -252,7 +265,7 @@ const SearchPanel = ({ onDisplayChange }) => {
       />
 
       <Combobox
-        className="w-[60px]"
+        className="w-[60px] shrink-0"
         buttonClassName={fieldClass}
         ariaLabel="Chapter"
         value={chapter}
@@ -261,7 +274,7 @@ const SearchPanel = ({ onDisplayChange }) => {
       />
 
       <Combobox
-        className="w-[60px]"
+        className="w-[60px] shrink-0"
         buttonClassName={fieldClass}
         ariaLabel="First verse"
         value={verseFrom}
@@ -270,15 +283,15 @@ const SearchPanel = ({ onDisplayChange }) => {
       />
 
       <Combobox
-        className="w-[60px]"
+        className="w-[60px] shrink-0"
         buttonClassName={fieldClass}
         ariaLabel="Last verse"
-        value={verseTill ?? 1}
-        options={verseOptions}
+        value={verseTill ?? verseFrom}
+        options={verseTillOptions}
         onChange={(next) => selectPassage({ chapter, verse: verseFrom, till: next })}
       />
 
-      <div className="relative">
+      <div className="relative min-w-[200px] flex-[2]">
         <input
           ref={searchInputRef}
           className={`w-full ${fieldClass}`}
@@ -320,19 +333,23 @@ const SearchPanel = ({ onDisplayChange }) => {
       {searchActive && (
         <div className="flex items-center gap-2 text-[0.8rem] font-medium text-white">
           <button
-            className="rounded-[5px] bg-field px-3 py-2 transition-colors duration-150 hover:border-[#007bff]
-              disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-[5px] bg-field px-3 py-2 transition-colors duration-150
+              hover:border-[#007bff] disabled:cursor-not-allowed disabled:opacity-40"
             onClick={prevResultPage}
             disabled={!hasPrevResults}
           >
             Prev
           </button>
           <span>
-            {searchResults.length > 0 ? `Page ${resultPage} of ${resultPageCount}` : 'No results'}
+            {searchResults === null
+              ? 'Searching...'
+              : searchResults.length > 0
+                ? `${resultTotal} result${resultTotal === 1 ? '' : 's'} · Page ${resultPage} of ${resultPageCount}`
+                : 'No results'}
           </span>
           <button
-            className="rounded-[5px] bg-field px-3 py-2 transition-colors duration-150 hover:border-[#007bff]
-              disabled:cursor-not-allowed disabled:opacity-40"
+            className="cursor-pointer rounded-[5px] bg-field px-3 py-2 transition-colors duration-150
+              hover:border-[#007bff] disabled:cursor-not-allowed disabled:opacity-40"
             onClick={nextResultPage}
             disabled={!hasNextResults}
           >
@@ -341,7 +358,7 @@ const SearchPanel = ({ onDisplayChange }) => {
         </div>
       )}
 
-      <div className="flex items-center">
+      <div className="flex shrink-0 items-center">
         <svg
           onClick={() => stepVerse(-1)}
           className="h-[30px] w-[30px] cursor-pointer text-[#edf8ff]"
@@ -371,7 +388,15 @@ const SearchPanel = ({ onDisplayChange }) => {
       </div>
 
       <button
-        className="cursor-pointer rounded-[5px] bg-[#dc3545] px-4 py-2 text-base text-white
+        className="shrink-0 cursor-pointer rounded-[5px] bg-[#28a745] px-4 py-2 text-base text-white
+          transition-colors duration-300 hover:bg-[#1e7e34] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]"
+        onClick={onShow}
+      >
+        Show
+      </button>
+
+      <button
+        className="shrink-0 cursor-pointer rounded-[5px] bg-[#dc3545] px-4 py-2 text-base text-white
           transition-colors duration-300 hover:bg-[#c82333] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]"
         onClick={handleClear}
       >

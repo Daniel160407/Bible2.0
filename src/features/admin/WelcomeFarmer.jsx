@@ -1,10 +1,10 @@
 const WelcomeFarmer = ({ onDismiss }) => (
   <div
     onClick={onDismiss}
-    className="fixed left-1/2 top-[40%] z-[1000] h-[100px] w-[100px] -translate-x-1/2 -translate-y-1/2 cursor-pointer text-center"
+    className="pointer-events-none fixed left-1/2 top-[40%] z-[1000] h-[100px] w-[100px] -translate-x-1/2 -translate-y-1/2 text-center"
   >
     <div
-      className="absolute -top-10 left-1/2 w-[200px] -translate-x-1/2 rounded-[50px] bg-white p-5
+      className="pointer-events-auto absolute -top-10 left-1/2 w-[200px] -translate-x-1/2 cursor-pointer rounded-[50px] bg-white p-5
         shadow-[0_4px_6px_rgba(0,0,0,0.1)]
         after:absolute after:-bottom-[15px] after:left-1/2 after:-translate-x-1/2 after:border-[10px]
         after:border-solid after:border-white after:border-b-transparent after:border-l-transparent after:border-r-transparent
@@ -19,7 +19,7 @@ const WelcomeFarmer = ({ onDismiss }) => (
       </p>
     </div>
 
-    <div className="relative mt-[90px]">
+    <div className="pointer-events-auto relative mx-auto mt-[90px] h-[180px] w-20 cursor-pointer">
       <div className="absolute top-0 left-1/2 h-5 w-20 -translate-x-1/2 rounded-t-[100%] bg-[#8b4513]" />
       <div className="absolute top-5 left-1/2 h-[100px] w-[60px] -translate-x-1/2 rounded-b-[10px] bg-[#006400]" />
       <div className="absolute top-[120px] left-1/2 h-[60px] w-2.5 -translate-x-1/2 bg-[#8b4513]" />

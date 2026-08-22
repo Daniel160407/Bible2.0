@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import AdminPage from './pages/AdminPage';
 import PresentViewPage from './pages/PresentViewPage';
 import BiblePage from './pages/BiblePage';
@@ -7,6 +8,13 @@ import DonationPage from './pages/DonationPage';
 
 const App = () => (
   <BrowserRouter>
+    <Toaster
+      position="top-right"
+      offset={20}
+      gap={12}
+      style={{ '--width': '400px' }}
+      toastOptions={{ unstyled: true, classNames: { toast: 'w-full' } }}
+    />
     <Routes>
       <Route path="/" element={<AdminPage />} />
       <Route path="/presentview" element={<PresentViewPage />} />

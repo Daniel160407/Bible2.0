@@ -1,59 +1,70 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MadeBy from '../../components/ui/MadeBy';
+import { useOpenPresentView } from '../../hooks/useOpenPresentView';
 
-const windowButtonClass =
-  'cursor-pointer rounded-[5px] border-none px-6 py-3 text-base text-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] ' +
-  'transition-[background-color,transform] duration-300 hover:scale-105 active:scale-100';
+const IconPresent = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+    <rect x="2.5" y="4" width="19" height="12.5" rx="2" />
+    <path d="M8 20.5h8M12 16.5v4" strokeLinecap="round" />
+  </svg>
+);
 
-const ignoreErrors = (action) => {
-  try {
-    action();
-  } catch (error) {
-    void error;
-  }
-};
+const IconBook = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+    <path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H5.5A1.5 1.5 0 0 0 4 19.5z" strokeLinejoin="round" />
+    <path d="M4 19.5A1.5 1.5 0 0 1 5.5 21H19" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconDocs = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" strokeLinejoin="round" />
+    <path d="M14 3v5h5M9 13h6M9 17h4" strokeLinecap="round" />
+  </svg>
+);
+
+const IconHeart = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+    <path
+      d="M12 20s-7-4.4-7-9.3A4.2 4.2 0 0 1 12 7.7a4.2 4.2 0 0 1 7 3c0 4.9-7 9.3-7 9.3z"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const IconChevron = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...props}>
+    <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconSpinner = (props) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" {...props}>
+    <circle cx="12" cy="12" r="9" opacity="0.25" />
+    <path d="M21 12a9 9 0 0 0-9-9" strokeLinecap="round" />
+  </svg>
+);
+
+const focusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-panel';
+
+const actionClass =
+  'group flex min-w-[104px] flex-col items-center gap-1.5 rounded-xl border border-white/5 bg-white/[0.04] px-4 py-3 ' +
+  'text-[13px] font-medium text-white/85 transition-colors duration-200 hover:border-white/15 hover:bg-white/[0.09] ' +
+  `hover:text-white active:bg-white/[0.06] ${focusRing}`;
 
 const ActionBar = () => {
   const [isHidden, setIsHidden] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const presentViewWindowRef = useRef(null);
   const barRef = useRef(null);
-  const hideButtonRef = useRef(null);
-  const alertTimeoutRef = useRef(null);
-  const windowCheckIntervalRef = useRef(null);
+  const toggleRef = useRef(null);
   const navigate = useNavigate();
-
-  const openPresentView = () => {
-    if (presentViewWindowRef.current && !presentViewWindowRef.current.closed) {
-      setShowAlert(true);
-      clearTimeout(alertTimeoutRef.current);
-      alertTimeoutRef.current = setTimeout(() => setShowAlert(false), 3000);
-      ignoreErrors(() => presentViewWindowRef.current.focus());
-      return;
-    }
-
-    const newWindow = window.open('/presentview', 'presentViewWindow', 'width=800,height=600');
-    if (!newWindow) return;
-
-    presentViewWindowRef.current = newWindow;
-    windowCheckIntervalRef.current = setInterval(() => {
-      if (newWindow.closed) {
-        clearInterval(windowCheckIntervalRef.current);
-        presentViewWindowRef.current = null;
-      }
-    }, 1000);
-
-    setTimeout(() => {
-      ignoreErrors(() => {
-        if (!newWindow.closed) newWindow.document.documentElement.requestFullscreen();
-      });
-    }, 1000);
-  };
+  const { openPresentView, isChecking } = useOpenPresentView();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (hideButtonRef.current?.contains(event.target)) return;
+      if (toggleRef.current?.contains(event.target)) return;
+      if (event.target.closest?.('[data-sonner-toaster]')) return;
       if (!isHidden && barRef.current && !barRef.current.contains(event.target)) {
         setIsHidden(true);
       }
@@ -62,69 +73,83 @@ const ActionBar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isHidden]);
 
-  useEffect(
-    () => () => {
-      clearTimeout(alertTimeoutRef.current);
-      clearInterval(windowCheckIntervalRef.current);
-    },
-    [],
-  );
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && !isHidden) setIsHidden(true);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isHidden]);
 
   return (
-    <div className="fixed bottom-5 left-1/2 z-[1000] flex -translate-x-1/2 flex-col items-center gap-2.5">
-      <div
-        ref={hideButtonRef}
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[1000] flex flex-col items-center px-4 pb-4">
+      <button
+        ref={toggleRef}
+        type="button"
         onClick={() => setIsHidden((hidden) => !hidden)}
-        className="cursor-pointer rounded-[5px] bg-panel/80 px-2.5 py-[5px] transition-colors duration-300 hover:bg-panel"
+        aria-expanded={!isHidden}
+        aria-controls="action-bar-panel"
+        className={`pointer-events-auto mb-2 flex items-center gap-2 rounded-full border border-white/10 bg-panel/90 px-4 py-2
+          text-[13px] font-medium text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur
+          transition-colors duration-200 hover:border-white/20 hover:bg-panel hover:text-white ${focusRing}`}
       >
-        <img
-          src="/images/hide.jpeg"
-          alt="Hide"
-          className="h-5 w-5 transition-transform duration-300 hover:scale-110"
+        <IconChevron
+          className={`h-4 w-4 transition-transform duration-300 ${isHidden ? '' : 'rotate-180'}`}
         />
-      </div>
+        {isHidden ? 'Show menu' : 'Hide menu'}
+      </button>
 
       <div
+        id="action-bar-panel"
         ref={barRef}
-        className={`relative flex flex-col overflow-hidden rounded-[10px] bg-panel shadow-[0_4px_8px_rgba(0,0,0,0.5)]
-          transition-all duration-300 ${
+        aria-hidden={isHidden}
+        className={`pointer-events-auto w-full max-w-[560px] origin-bottom overflow-hidden rounded-2xl border border-white/10
+          bg-panel/95 shadow-[0_12px_40px_rgba(0,0,0,0.55)] backdrop-blur transition-all duration-300 ease-out ${
             isHidden
-              ? 'pointer-events-none m-0 max-h-0 gap-0 p-0 py-0 opacity-0 translate-y-5'
-              : 'max-h-[500px] gap-4 p-4 opacity-100 translate-y-0'
+              ? 'pointer-events-none max-h-0 scale-95 border-transparent opacity-0'
+              : 'max-h-[320px] scale-100 opacity-100'
           }`}
       >
-        <div className="flex flex-wrap justify-center gap-4">
-          <button onClick={() => navigate('/donation')} className="button-85">
-            Donate
-          </button>
+        <div className="flex flex-col gap-3 p-3">
           <button
-            onClick={() => window.open('/documentation', '_blank')}
-            className={`${windowButtonClass} bg-[#007bff] hover:bg-[#0056b3] active:bg-[#004494]`}
+            type="button"
+            onClick={openPresentView}
+            disabled={isChecking}
+            className={`flex items-center justify-center gap-2.5 rounded-xl bg-accent px-5 py-3.5 text-[15px] font-semibold
+              text-surface transition-[background-color,opacity] duration-200 hover:bg-[#ffd633]
+              disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`}
           >
-            Documentation
+            {isChecking ? (
+              <IconSpinner className="h-5 w-5 animate-spin" />
+            ) : (
+              <IconPresent className="h-5 w-5" />
+            )}
+            {isChecking ? 'Opening…' : 'Open Present View'}
           </button>
-          <button
-            onClick={() => window.open('/bible', '_blank')}
-            className={`${windowButtonClass} bg-[#28a745] hover:bg-[#218838] active:bg-[#1e7e34]`}
-          >
-            Bible
-          </button>
-          <button onClick={openPresentView} className="button-85">
-            Open Present View
-          </button>
+
+          <div className="grid grid-cols-3 gap-2">
+            <button type="button" onClick={() => window.open('/bible', '_blank')} className={actionClass}>
+              <IconBook className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-accent" />
+              Bible
+            </button>
+            <button
+              type="button"
+              onClick={() => window.open('/documentation', '_blank')}
+              className={actionClass}
+            >
+              <IconDocs className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-accent" />
+              Docs
+            </button>
+            <button type="button" onClick={() => navigate('/donation')} className={actionClass}>
+              <IconHeart className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-red-400" />
+              Donate
+            </button>
+          </div>
         </div>
 
-        {showAlert && (
-          <div
-            className="absolute -top-10 left-1/2 z-[1000] -translate-x-1/2 animate-fade-in-out
-              whitespace-nowrap rounded bg-[#ff4444] px-4 py-2 text-sm text-white
-              shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
-          >
-            Present View is already open!
-          </div>
-        )}
-
-        <MadeBy href="https://www.facebook.com/daniel.abulashvili.5/" />
+        <div className="border-t border-white/5 px-3 py-2">
+          <MadeBy href="https://www.facebook.com/daniel.abulashvili.5/" />
+        </div>
       </div>
     </div>
   );

@@ -12,6 +12,13 @@ const metaQueryOptions = (language) => ({
   staleTime: Infinity,
 });
 
+export const chapterQueryOptions = ({ bookIndex, chapter, version, language }) => ({
+  queryKey: ['chapter', language, version, bookIndex, chapter],
+  queryFn: () => fetchBible({ book: bookIndex, chapter, version, language }),
+  staleTime: Infinity,
+  gcTime: Infinity,
+});
+
 export const useBibleMeta = (language) => useQuery(metaQueryOptions(language));
 
 export const useProjectorMeta = () =>
@@ -25,14 +32,13 @@ export const useProjectorMeta = () =>
 
 export const useChapter = ({ bookIndex, chapter, version, language }) =>
   useQuery({
-    queryKey: ['chapter', language, version, bookIndex, chapter],
-    queryFn: () => fetchBible({ book: bookIndex, chapter, version, language }),
+    ...chapterQueryOptions({ bookIndex, chapter, version, language }),
     select: (data) => ({
       verses: data.bibleData ?? [],
+      books: data.bibleNames ?? [],
       chapterCount: getChapterCount(data),
       verseCount: getVerseCount(data),
     }),
     enabled: Boolean(bookIndex && chapter && language),
     placeholderData: keepPreviousData,
-    staleTime: Infinity,
   });

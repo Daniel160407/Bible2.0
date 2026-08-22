@@ -60,7 +60,7 @@ const VersePreview = ({ display, separatedVerse, onSeparate }) => {
 
   return (
     <div
-      className="mt-5 max-h-[450px] overflow-y-auto rounded-[10px] bg-panel p-5 font-banner
+      className="mt-5 max-h-[600px] overflow-y-auto rounded-[10px] bg-panel p-5 font-banner
         text-[#f5f5f5] shadow-[0_4px_8px_rgba(0,0,0,0.3)]"
     >
       {renderContent()}

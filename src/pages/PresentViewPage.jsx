@@ -1,5 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createProjectorChannel } from '../lib/projectorChannel';
+import {
+  PRESENT_VIEW_BYE,
+  PRESENT_VIEW_CLOSE,
+  PRESENT_VIEW_PING,
+  PRESENT_VIEW_PONG,
+  PRESENT_VIEW_STATE,
+  PRESENT_VIEW_STATE_REQUEST,
+  createProjectorChannel,
+  isPreviewMode,
+} from '../lib/projectorChannel';
 import { DEFAULT_PROJECTOR_STYLE, PROJECTOR_LANGUAGES } from '../lib/constants';
 
 const MIN_FONT_SIZE = 8;
@@ -11,11 +20,48 @@ const PresentViewPage = () => {
   const containerRef = useRef(null);
   const contentRef = useRef(null);
 
+  const stateRef = useRef(null);
+  stateRef.current = { style, verses: versesByLanguage, visible };
+
   useEffect(() => {
     const channel = createProjectorChannel();
+    const isPreview = isPreviewMode();
+    const instanceId = `${Date.now()}-${Math.random()}`;
+
+    const announcePresence = () =>
+      channel.postMessage({
+        type: PRESENT_VIEW_PONG,
+        id: instanceId,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+
     channel.onmessage = (event) => {
       const message = event.data;
       switch (message?.type) {
+        case PRESENT_VIEW_PING:
+          if (!isPreview) announcePresence();
+          break;
+        case PRESENT_VIEW_STATE_REQUEST:
+          if (!isPreview) {
+            channel.postMessage({
+              type: PRESENT_VIEW_STATE,
+              id: instanceId,
+              ...stateRef.current,
+            });
+          }
+          break;
+        case PRESENT_VIEW_STATE:
+          setStyle(message.style);
+          setVersesByLanguage(message.verses);
+          setVisible(message.visible);
+          break;
+        case PRESENT_VIEW_CLOSE:
+          if (!isPreview && (message.id == null || message.id === instanceId)) {
+            channel.postMessage({ type: PRESENT_VIEW_BYE, id: instanceId });
+            window.close();
+          }
+          break;
         case 'style':
           setStyle(message.style);
           break;
@@ -30,8 +76,18 @@ const PresentViewPage = () => {
           break;
       }
     };
+    channel.postMessage({ type: PRESENT_VIEW_STATE_REQUEST });
     channel.postMessage({ type: 'sync-request' });
-    return () => channel.close();
+    if (!isPreview) announcePresence();
+
+    const sayBye = () => channel.postMessage({ type: PRESENT_VIEW_BYE, id: instanceId });
+    if (!isPreview) window.addEventListener('pagehide', sayBye);
+
+    return () => {
+      window.removeEventListener('pagehide', sayBye);
+      if (!isPreview) sayBye();
+      channel.close();
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -101,7 +157,10 @@ const PresentViewPage = () => {
         textAlign: style.textAlign,
       }}
     >
-      <div ref={containerRef} className="flex h-full w-full flex-col justify-center overflow-hidden">
+      <div
+        ref={containerRef}
+        className="flex h-full w-full flex-col justify-center overflow-hidden"
+      >
         <div ref={contentRef}>
           {visible &&
             versesByLanguage &&
@@ -111,7 +170,11 @@ const PresentViewPage = () => {
               return (
                 <div key={key} className="mb-[0.5em] last:mb-0">
                   {group.verses.map((verse, index) => (
-                    <h1 key={verse?.id ?? index} className="font-bold leading-tight" style={textStyle}>
+                    <h1
+                      key={verse?.id ?? index}
+                      className="font-bold leading-tight"
+                      style={textStyle}
+                    >
                       {verse?.bv}
                     </h1>
                   ))}

@@ -109,7 +109,7 @@ const Combobox = ({
     <div ref={rootRef} className={`relative ${className}`}>
       <input
         ref={inputRef}
-        className={`w-full cursor-pointer ${buttonClassName}`}
+        className={`w-full ${disabled ? 'cursor-not-allowed' : open ? 'cursor-text' : 'cursor-pointer'} ${buttonClassName}`}
         type="text"
         role="combobox"
         aria-expanded={open}
