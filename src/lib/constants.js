@@ -1,7 +1,5 @@
-/** bibleNames[0..2] are section headers ("Bible", "Old/New Testament"); books start here. */
 export const FIRST_BOOK_INDEX = 4;
 
-/** Languages available for the preview panels. */
 export const PREVIEW_LANGUAGES = [
   { value: 'geo', label: 'GEO' },
   { value: 'eng', label: 'ENG' },
@@ -13,7 +11,6 @@ export const PREVIEW_LANGUAGES = [
   { value: 'es', label: 'SP' },
 ];
 
-/** Languages that can be shown on the projector simultaneously. */
 export const PROJECTOR_LANGUAGES = [
   {
     key: 'geo',
@@ -35,10 +32,6 @@ export const PROJECTOR_LANGUAGES = [
   },
 ];
 
-/**
- * The English bibleNames list orders the epistles differently from the Georgian
- * canon (James..Jude come before Romans), so book indexes 48-68 must be remapped.
- */
 export const ENGLISH_BOOK_INDEXES = {
   48: 62, 49: 63, 50: 64, 51: 65, 52: 66, 53: 67, 54: 68,
   55: 48, 56: 49, 57: 50, 58: 51, 59: 52, 60: 53, 61: 54,
@@ -49,15 +42,12 @@ const CANONICAL_BOOK_INDEXES = Object.fromEntries(
   Object.entries(ENGLISH_BOOK_INDEXES).map(([geo, eng]) => [eng, Number(geo)]),
 );
 
-/** Canonical (Georgian-order) book index -> index in the given language's book list. */
 export const mapBookIndexForLanguage = (bookIndex, apiCode) =>
   apiCode === 'eng' ? (ENGLISH_BOOK_INDEXES[bookIndex] ?? bookIndex) : bookIndex;
 
-/** Index in the given language's book list -> canonical (Georgian-order) index. */
 export const canonicalBookIndex = (listIndex, apiCode) =>
   apiCode === 'eng' ? (CANONICAL_BOOK_INDEXES[listIndex] ?? listIndex) : listIndex;
 
-/** Book display name for a canonical index in the given language's book list. */
 export const bookNameForLanguage = (books, bookIndex, apiCode) =>
   books?.[mapBookIndexForLanguage(bookIndex, apiCode) - 1] ?? '';
 
@@ -81,7 +71,6 @@ export const BACKGROUNDS = Array.from({ length: 20 }, (_, i) => `/backgrounds/${
 
 export const DEFAULT_BACKGROUND = '/backgrounds/16.jpeg';
 
-/** Shape of "what is currently selected for preview/projection". */
 export const EMPTY_DISPLAY = {
   book: null,
   bookIndex: null,

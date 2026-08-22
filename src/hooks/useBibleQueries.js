@@ -12,10 +12,8 @@ const metaQueryOptions = (language) => ({
   staleTime: Infinity,
 });
 
-/** Versions and book names for a language. */
 export const useBibleMeta = (language) => useQuery(metaQueryOptions(language));
 
-/** Versions and book names for every projector language at once, keyed by language key. */
 export const useProjectorMeta = () =>
   useQueries({
     queries: PROJECTOR_LANGUAGES.map(({ apiCode }) => metaQueryOptions(apiCode)),
@@ -25,7 +23,6 @@ export const useProjectorMeta = () =>
       ),
   });
 
-/** Verses of one chapter, plus the book's chapter count and the chapter's verse count. */
 export const useChapter = ({ bookIndex, chapter, version, language }) =>
   useQuery({
     queryKey: ['chapter', language, version, bookIndex, chapter],

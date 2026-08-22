@@ -5,10 +5,6 @@ const cardClass =
 const textClass = 'm-0 text-2xl font-bold leading-[1.4] text-white';
 const referenceClass = 'mt-2.5 text-base font-bold italic text-[#aaaaaa]';
 
-/**
- * Preview of what will be sent to the projector: either the selected passage,
- * search results (each with a "Separate" button), or a single separated verse.
- */
 const VersePreview = ({ display, separatedVerse, onSeparate }) => {
   const renderContent = () => {
     if (separatedVerse) {

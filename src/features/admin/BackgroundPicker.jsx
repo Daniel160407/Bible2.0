@@ -7,7 +7,6 @@ const itemClass =
 const inputClass =
   'mb-2 w-full rounded border border-[#444] bg-[#2c3e50] p-2 text-[#e0e0e0] transition-colors duration-300 focus:border-[#66afe9] focus:outline-none';
 
-/** Projector background: one of the bundled images, an image URL, or a local file. */
 const BackgroundPicker = ({ onSelect }) => {
   const [imageUrl, setImageUrl] = useState('');
   const [fileUrl, setFileUrl] = useState('');

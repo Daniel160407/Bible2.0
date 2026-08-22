@@ -6,7 +6,14 @@ const windowButtonClass =
   'cursor-pointer rounded-[5px] border-none px-6 py-3 text-base text-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] ' +
   'transition-[background-color,transform] duration-300 hover:scale-105 active:scale-100';
 
-/** Floating bottom bar with navigation buttons and the present-view launcher. */
+const ignoreErrors = (action) => {
+  try {
+    action();
+  } catch (error) {
+    void error;
+  }
+};
+
 const ActionBar = () => {
   const [isHidden, setIsHidden] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -18,16 +25,11 @@ const ActionBar = () => {
   const navigate = useNavigate();
 
   const openPresentView = () => {
-    // Only one present view window may exist; focus it instead of opening another.
     if (presentViewWindowRef.current && !presentViewWindowRef.current.closed) {
       setShowAlert(true);
       clearTimeout(alertTimeoutRef.current);
       alertTimeoutRef.current = setTimeout(() => setShowAlert(false), 3000);
-      try {
-        presentViewWindowRef.current.focus();
-      } catch {
-        // Cross-window focus can be blocked by the browser; nothing to do.
-      }
+      ignoreErrors(() => presentViewWindowRef.current.focus());
       return;
     }
 
@@ -43,15 +45,12 @@ const ActionBar = () => {
     }, 1000);
 
     setTimeout(() => {
-      try {
+      ignoreErrors(() => {
         if (!newWindow.closed) newWindow.document.documentElement.requestFullscreen();
-      } catch {
-        // Fullscreen needs a user gesture in some browsers; the operator can press F11.
-      }
+      });
     }, 1000);
   };
 
-  // Collapse the bar when clicking anywhere outside it.
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (hideButtonRef.current?.contains(event.target)) return;

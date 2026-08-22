@@ -2,10 +2,6 @@ import { useEffect, useState } from 'react';
 import { createProjectorChannel } from '../lib/projectorChannel';
 import { DEFAULT_PROJECTOR_STYLE, PROJECTOR_LANGUAGES } from '../lib/constants';
 
-/**
- * The projector window. Fully driven by BroadcastChannel messages from the
- * admin page; on mount it asks the admin to re-send the current style.
- */
 const PresentViewPage = () => {
   const [style, setStyle] = useState(DEFAULT_PROJECTOR_STYLE);
   const [versesByLanguage, setVersesByLanguage] = useState(null);

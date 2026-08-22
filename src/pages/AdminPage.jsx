@@ -5,10 +5,6 @@ import ProjectorPanel from '../features/admin/ProjectorPanel';
 import ActionBar from '../features/admin/ActionBar';
 import { EMPTY_DISPLAY } from '../lib/constants';
 
-/**
- * The operator's page: pick or search verses, preview them, and control
- * what the projector window shows.
- */
 const AdminPage = () => {
   const [display, setDisplay] = useState(EMPTY_DISPLAY);
   const [separatedVerse, setSeparatedVerse] = useState(null);

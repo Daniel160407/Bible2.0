@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useBibleMeta, useChapter } from '../../hooks/useBibleQueries';
 import { useVerseSearch } from '../../hooks/useVerseSearch';
@@ -11,6 +11,7 @@ import {
   canonicalBookIndex,
   mapBookIndexForLanguage,
 } from '../../lib/constants';
+import Combobox from '../../components/ui/Combobox';
 import Loader from '../../components/ui/Loader';
 import WelcomeFarmer from './WelcomeFarmer';
 
@@ -21,6 +22,9 @@ const fieldClass =
 
 const SLOW_NETWORK_DELAY_MS = 2000;
 
+const numberOptions = (count) =>
+  Array.from({ length: count }, (_, i) => ({ value: i + 1, label: String(i + 1) }));
+
 const SearchPanel = ({ onDisplayChange }) => {
   const [language, setLanguage] = useState('geo');
   const [version, setVersion] = useState('');
@@ -29,15 +33,12 @@ const SearchPanel = ({ onDisplayChange }) => {
   const [verseFrom, setVerseFrom] = useState(1);
   const [verseTill, setVerseTill] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [wholeBible, setWholeBible] = useState(false);
-  // When true, the preview shows search results / nothing instead of the selected passage.
   const [passageSuppressed, setPassageSuppressed] = useState(false);
   const [showSlowNetwork, setShowSlowNetwork] = useState(false);
   const [showWelcome, setShowWelcome] = useState(() => Cookies.get('newCustomer') === undefined);
 
   const { data: meta, isFetching: metaLoading } = useBibleMeta(language);
   const books = meta?.books ?? [];
-  const versions = meta?.versions ?? [];
 
   const { data: chapterData, isFetching: chapterLoading } = useChapter({
     bookIndex: mapBookIndexForLanguage(bookIndex, language),
@@ -48,11 +49,33 @@ const SearchPanel = ({ onDisplayChange }) => {
   const verseCount = chapterData?.verseCount ?? 0;
   const chapterCount = chapterData?.chapterCount ?? 0;
 
-  const { searchBook, searchWholeBible, isSearching } = useVerseSearch({ language, books });
+  const {
+    run: runSearch,
+    clear: clearSearch,
+    next: nextResultPage,
+    prev: prevResultPage,
+    results: searchResults,
+    isActive: searchActive,
+    page: resultPage,
+    pageCount: resultPageCount,
+    hasPrev: hasPrevResults,
+    hasNext: hasNextResults,
+    isSearching,
+  } = useVerseSearch({ language, books });
 
   const loading = metaLoading || chapterLoading || isSearching;
 
-  // Keep the selected version valid for the current language.
+  const versionOptions = useMemo(
+    () => (meta?.versions ?? []).map((item) => ({ value: item, label: item })),
+    [meta],
+  );
+  const bookOptions = useMemo(
+    () => (meta?.books ?? []).map((book) => ({ value: book, label: book })),
+    [meta],
+  );
+  const chapterOptions = useMemo(() => numberOptions(chapterCount), [chapterCount]);
+  const verseOptions = useMemo(() => numberOptions(verseCount), [verseCount]);
+
   useEffect(() => {
     const available = meta?.versions ?? [];
     if (available.length > 0 && !available.includes(version)) {
@@ -60,7 +83,6 @@ const SearchPanel = ({ onDisplayChange }) => {
     }
   }, [meta, version]);
 
-  // Show a hint when a request takes suspiciously long.
   useEffect(() => {
     if (!loading) {
       setShowSlowNetwork(false);
@@ -70,7 +92,6 @@ const SearchPanel = ({ onDisplayChange }) => {
     return () => clearTimeout(timer);
   }, [loading]);
 
-  // Push the selected passage into the preview whenever the selection or its data changes.
   useEffect(() => {
     if (passageSuppressed || !chapterData?.verses?.length) return;
     onDisplayChange({
@@ -84,7 +105,13 @@ const SearchPanel = ({ onDisplayChange }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterData, bookIndex, chapter, verseFrom, verseTill, passageSuppressed]);
 
+  useEffect(() => {
+    if (searchActive) onDisplayChange({ ...EMPTY_DISPLAY, verses: searchResults });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchResults, searchActive]);
+
   const selectPassage = ({ book = bookIndex, chapter: nextChapter = 1, verse = 1, till = null }) => {
+    clearSearch();
     setPassageSuppressed(false);
     setBookIndex(book);
     setChapter(nextChapter);
@@ -92,8 +119,8 @@ const SearchPanel = ({ onDisplayChange }) => {
     setVerseTill(till);
   };
 
-  const handleBookChange = (e) => {
-    const listIndex = books.indexOf(e.target.value) + 1;
+  const handleBookChange = (bookName) => {
+    const listIndex = books.indexOf(bookName) + 1;
     selectPassage({ book: canonicalBookIndex(listIndex, language) });
   };
 
@@ -101,11 +128,6 @@ const SearchPanel = ({ onDisplayChange }) => {
     setPassageSuppressed(false);
     setVerseTill(null);
     setVerseFrom((verse) => Math.min(Math.max(verse + delta, 1), Math.max(verseCount, 1)));
-  };
-
-  const showSearchResults = (verses) => {
-    setPassageSuppressed(true);
-    onDisplayChange({ ...EMPTY_DISPLAY, verses });
   };
 
   const handleSearchKeyDown = (e) => {
@@ -123,19 +145,12 @@ const SearchPanel = ({ onDisplayChange }) => {
       return;
     }
 
-    if (wholeBible) {
-      searchWholeBible({ text: searchText, version, onResults: showSearchResults });
-    } else {
-      searchBook({
-        text: searchText,
-        version,
-        bookIndex: mapBookIndexForLanguage(bookIndex, language),
-        onResults: showSearchResults,
-      });
-    }
+    setPassageSuppressed(true);
+    runSearch({ text: searchText, version });
   };
 
   const handleClear = () => {
+    clearSearch();
     setPassageSuppressed(true);
     onDisplayChange(EMPTY_DISPLAY);
   };
@@ -150,7 +165,10 @@ const SearchPanel = ({ onDisplayChange }) => {
       <select
         className={`${fieldClass} cursor-pointer`}
         value={language}
-        onChange={(e) => setLanguage(e.target.value)}
+        onChange={(e) => {
+          clearSearch();
+          setLanguage(e.target.value);
+        }}
       >
         {PREVIEW_LANGUAGES.map(({ value, label }) => (
           <option key={value} value={value}>
@@ -159,67 +177,50 @@ const SearchPanel = ({ onDisplayChange }) => {
         ))}
       </select>
 
-      <select
-        className={`${fieldClass} cursor-pointer`}
+      <Combobox
+        className="w-[300px] max-w-full"
+        buttonClassName={fieldClass}
+        ariaLabel="Version"
         value={version}
-        onChange={(e) => setVersion(e.target.value)}
-      >
-        {versions.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
+        options={versionOptions}
+        onChange={setVersion}
+      />
 
-      <select
-        className={`${fieldClass} cursor-pointer`}
+      <Combobox
+        className="w-[180px] max-w-full"
+        buttonClassName={fieldClass}
+        ariaLabel="Book"
         value={bookNameForLanguage(books, bookIndex, language)}
+        options={bookOptions}
         onChange={handleBookChange}
-      >
-        {books.map((book) => (
-          <option key={book} value={book}>
-            {book}
-          </option>
-        ))}
-      </select>
+      />
 
-      <select
-        className={`${fieldClass} w-[60px] cursor-pointer`}
+      <Combobox
+        className="w-[60px]"
+        buttonClassName={fieldClass}
+        ariaLabel="Chapter"
         value={chapter}
-        onChange={(e) => selectPassage({ chapter: Number(e.target.value) })}
-      >
-        {Array.from({ length: chapterCount }, (_, i) => (
-          <option key={i + 1} value={i + 1}>
-            {i + 1}
-          </option>
-        ))}
-      </select>
+        options={chapterOptions}
+        onChange={(next) => selectPassage({ chapter: next })}
+      />
 
-      <select
-        className={`${fieldClass} w-[60px] cursor-pointer`}
+      <Combobox
+        className="w-[60px]"
+        buttonClassName={fieldClass}
+        ariaLabel="First verse"
         value={verseFrom}
-        onChange={(e) => selectPassage({ chapter, verse: Number(e.target.value) })}
-      >
-        {Array.from({ length: verseCount }, (_, i) => (
-          <option key={i + 1} value={i + 1}>
-            {i + 1}
-          </option>
-        ))}
-      </select>
+        options={verseOptions}
+        onChange={(next) => selectPassage({ chapter, verse: next })}
+      />
 
-      <select
-        className={`${fieldClass} w-[60px] cursor-pointer`}
+      <Combobox
+        className="w-[60px]"
+        buttonClassName={fieldClass}
+        ariaLabel="Last verse"
         value={verseTill ?? 1}
-        onChange={(e) =>
-          selectPassage({ chapter, verse: verseFrom, till: Number(e.target.value) })
-        }
-      >
-        {Array.from({ length: verseCount }, (_, i) => (
-          <option key={i + 1} value={i + 1}>
-            {i + 1}
-          </option>
-        ))}
-      </select>
+        options={verseOptions}
+        onChange={(next) => selectPassage({ chapter, verse: verseFrom, till: next })}
+      />
 
       <input
         className={fieldClass}
@@ -230,23 +231,29 @@ const SearchPanel = ({ onDisplayChange }) => {
         onKeyDown={handleSearchKeyDown}
       />
 
-      <div className="mt-4 flex justify-center">
-        <label className="relative inline-flex cursor-pointer items-center gap-2 text-[0.8rem] font-medium text-white">
-          <input
-            type="checkbox"
-            className="peer hidden"
-            checked={wholeBible}
-            onChange={(e) => setWholeBible(e.target.checked)}
-          />
-          <span
-            className="relative h-5 w-10 rounded-full bg-[#ccc] transition-colors duration-[400ms]
-              before:absolute before:left-0.5 before:top-0.5 before:h-4 before:w-4 before:rounded-full
-              before:bg-white before:transition-transform before:duration-[400ms]
-              peer-checked:bg-[#4caf50] peer-checked:before:translate-x-5"
-          />
-          Search in Whole Bible
-        </label>
-      </div>
+      {searchActive && (
+        <div className="flex items-center gap-2 text-[0.8rem] font-medium text-white">
+          <button
+            className="rounded-[5px] bg-field px-3 py-2 transition-colors duration-150 hover:border-[#007bff]
+              disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={prevResultPage}
+            disabled={!hasPrevResults}
+          >
+            Prev
+          </button>
+          <span>
+            {searchResults.length > 0 ? `Page ${resultPage} of ${resultPageCount}` : 'No results'}
+          </span>
+          <button
+            className="rounded-[5px] bg-field px-3 py-2 transition-colors duration-150 hover:border-[#007bff]
+              disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={nextResultPage}
+            disabled={!hasNextResults}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center">
         <svg

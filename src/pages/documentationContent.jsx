@@ -1,10 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 const Red = ({ children }) => <span className="font-bold text-[#ff4444]">{children}</span>;
 
-/**
- * Documentation texts per language. Each entry: page title, YouTube video url,
- * and an ordered list of content blocks rendered by DocumentationPage.
- */
 export const DOCUMENTATION = {
   geo: {
     title: 'დოკუმენტაცია',

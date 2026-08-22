@@ -10,10 +10,6 @@ import {
 import ProjectorControls from './ProjectorControls';
 import BackgroundPicker from './BackgroundPicker';
 
-/**
- * Owns the projector state (style, enabled languages, versions) and the
- * BroadcastChannel that drives the present view window.
- */
 const ProjectorPanel = ({ display, separatedVerse }) => {
   const channelRef = useRef(null);
   const [style, setStyle] = useState(DEFAULT_PROJECTOR_STYLE);
@@ -31,7 +27,6 @@ const ProjectorPanel = ({ display, separatedVerse }) => {
   useEffect(() => {
     const channel = createProjectorChannel();
     channelRef.current = channel;
-    // Re-send the current style when a (re)opened present view window asks for it.
     channel.onmessage = (event) => {
       if (event.data?.type === 'sync-request') {
         channel.postMessage({ type: 'style', style: styleRef.current });

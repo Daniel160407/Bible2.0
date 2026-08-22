@@ -22,7 +22,6 @@ const fieldClass =
 
 const stripHtml = (html) => html.replace(/(<([^>]+)>)/gi, '');
 
-/** Standalone Bible reader: browse whole chapters, search, and copy verses. */
 const BiblePage = () => {
   const [language, setLanguage] = useState(() => Cookies.get('language') ?? 'geo');
   const [version, setVersion] = useState(() => Cookies.get('version') ?? '');
@@ -30,7 +29,6 @@ const BiblePage = () => {
   const [chapter, setChapter] = useState(() => Number(Cookies.get('chapter')) || 1);
   const [highlightedVerse, setHighlightedVerse] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [searchResults, setSearchResults] = useState(null);
 
   const { data: meta, isFetching: metaLoading } = useBibleMeta(language);
   const books = meta?.books ?? [];
@@ -43,7 +41,19 @@ const BiblePage = () => {
     language,
   });
 
-  const { searchWholeBible, isSearching } = useVerseSearch({ language, books });
+  const {
+    run: runSearch,
+    clear: clearSearch,
+    next: nextResultPage,
+    prev: prevResultPage,
+    results: searchResults,
+    isActive: searchActive,
+    page: resultPage,
+    pageCount: resultPageCount,
+    hasPrev: hasPrevResults,
+    hasNext: hasNextResults,
+    isSearching,
+  } = useVerseSearch({ language, books });
   const loading = metaLoading || chapterLoading || isSearching;
 
   const bookName = bookNameForLanguage(books, bookIndex, language);
@@ -56,7 +66,6 @@ const BiblePage = () => {
     }
   }, [meta, version]);
 
-  // Scroll the highlighted verse into view once its chapter is rendered.
   useEffect(() => {
     if (highlightedVerse == null) return;
     document
@@ -65,7 +74,7 @@ const BiblePage = () => {
   }, [highlightedVerse, chapterData]);
 
   const selectPassage = ({ book = bookIndex, chapter: nextChapter = 1, verse = null }) => {
-    setSearchResults(null);
+    clearSearch();
     setBookIndex(book);
     setChapter(nextChapter);
     setHighlightedVerse(verse);
@@ -75,7 +84,7 @@ const BiblePage = () => {
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
-    setSearchResults(null);
+    clearSearch();
     Cookies.remove('version');
     Cookies.set('language', e.target.value, COOKIE_OPTIONS);
   };
@@ -105,7 +114,7 @@ const BiblePage = () => {
     }
 
     setHighlightedVerse(null);
-    searchWholeBible({ text: searchText, version, onResults: setSearchResults });
+    runSearch({ text: searchText, version });
   };
 
   const handleCopy = (verse) => {
@@ -187,7 +196,14 @@ const BiblePage = () => {
       <div>
         {loading && <Loader />}
         <h1 className="my-[0.67em] text-center text-[2em] font-bold text-accent">{bookName}</h1>
-        {searchResults && <p>{searchResults.length} Results found</p>}
+        {searchActive &&
+          (searchResults.length > 0 ? (
+            <p>
+              Page {resultPage} of {resultPageCount}
+            </p>
+          ) : (
+            <p>No results found</p>
+          ))}
         {verses.map((verse) => {
           const isHighlighted = !searchResults && Number(verse.muxli) === highlightedVerse;
           return (
@@ -221,15 +237,40 @@ const BiblePage = () => {
         })}
       </div>
 
-      <div className="mt-5 flex justify-center">
-        <button
-          onClick={() => selectPassage({ chapter: chapter + 1 })}
-          className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
-            transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
-            focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]"
-        >
-          Next Chapter
-        </button>
+      <div className="mt-5 flex justify-center gap-2.5">
+        {searchActive ? (
+          <>
+            <button
+              onClick={prevResultPage}
+              disabled={!hasPrevResults}
+              className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
+                transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
+                focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]
+                disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+            >
+              Previous
+            </button>
+            <button
+              onClick={nextResultPage}
+              disabled={!hasNextResults}
+              className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
+                transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
+                focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]
+                disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+            >
+              Next
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => selectPassage({ chapter: chapter + 1 })}
+            className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
+              transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
+              focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]"
+          >
+            Next Chapter
+          </button>
+        )}
       </div>
 
       <div className="mt-4">

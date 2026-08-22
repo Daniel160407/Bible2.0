@@ -13,7 +13,6 @@ const sectionTitleClass =
 const rowClass = 'my-2 flex w-full items-center gap-4 max-md:flex-wrap max-md:gap-2';
 const labelClass = 'w-[120px] shrink-0 text-base text-[#e0e0e0] max-md:w-full max-sm:text-sm';
 
-/** Show/Clear actions and text decoration + language settings for the projector. */
 const ProjectorControls = ({
   style,
   onStyleChange,

@@ -1,4 +1,3 @@
-/** CSS-art farmer with a speech bubble that greets first-time users. */
 const WelcomeFarmer = ({ onDismiss }) => (
   <div
     onClick={onDismiss}
