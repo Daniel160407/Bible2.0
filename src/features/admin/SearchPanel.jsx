@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useBibleMeta, useChapter } from '../../hooks/useBibleQueries';
 import { useVerseSearch } from '../../hooks/useVerseSearch';
@@ -21,6 +21,7 @@ const fieldClass =
   'hover:border-[#007bff] focus:border-[#007bff] focus:shadow-[0_0_0_0.2rem_rgba(0,123,255,0.25)]';
 
 const SLOW_NETWORK_DELAY_MS = 2000;
+const BOOK_HINT_LIMIT = 8;
 
 const numberOptions = (count) =>
   Array.from({ length: count }, (_, i) => ({ value: i + 1, label: String(i + 1) }));
@@ -33,12 +34,16 @@ const SearchPanel = ({ onDisplayChange }) => {
   const [verseFrom, setVerseFrom] = useState(1);
   const [verseTill, setVerseTill] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [bookHintOpen, setBookHintOpen] = useState(false);
+  const [bookHintIndex, setBookHintIndex] = useState(0);
   const [passageSuppressed, setPassageSuppressed] = useState(false);
   const [showSlowNetwork, setShowSlowNetwork] = useState(false);
   const [showWelcome, setShowWelcome] = useState(() => Cookies.get('newCustomer') === undefined);
 
+  const searchInputRef = useRef(null);
+
   const { data: meta, isFetching: metaLoading } = useBibleMeta(language);
-  const books = meta?.books ?? [];
+  const books = useMemo(() => meta?.books ?? [], [meta]);
 
   const { data: chapterData, isFetching: chapterLoading } = useChapter({
     bookIndex: mapBookIndexForLanguage(bookIndex, language),
@@ -70,9 +75,20 @@ const SearchPanel = ({ onDisplayChange }) => {
     [meta],
   );
   const bookOptions = useMemo(
-    () => (meta?.books ?? []).map((book) => ({ value: book, label: book })),
-    [meta],
+    () => books.map((book) => ({ value: book, label: book })),
+    [books],
   );
+  const bookHints = useMemo(() => {
+    const query = searchText.trim().toLowerCase();
+    if (query === '' || books.length === 0) return [];
+    if (books.some((book) => book.toLowerCase() === query)) return [];
+    const starts = books.filter((book) => book.toLowerCase().startsWith(query));
+    const contains = books.filter(
+      (book) => !book.toLowerCase().startsWith(query) && book.toLowerCase().includes(query),
+    );
+    return [...starts, ...contains].slice(0, BOOK_HINT_LIMIT);
+  }, [books, searchText]);
+
   const chapterOptions = useMemo(() => numberOptions(chapterCount), [chapterCount]);
   const verseOptions = useMemo(() => numberOptions(verseCount), [verseCount]);
 
@@ -130,8 +146,48 @@ const SearchPanel = ({ onDisplayChange }) => {
     setVerseFrom((verse) => Math.min(Math.max(verse + delta, 1), Math.max(verseCount, 1)));
   };
 
+  const hintsVisible = bookHintOpen && bookHints.length > 0;
+
+  const commitBookHint = (bookName) => {
+    setSearchText(`${bookName} `);
+    setBookHintOpen(false);
+    setBookHintIndex(0);
+    searchInputRef.current?.focus();
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchText(e.target.value);
+    setBookHintOpen(true);
+    setBookHintIndex(0);
+  };
+
   const handleSearchKeyDown = (e) => {
+    if (hintsVisible) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setBookHintIndex((index) => (index + 1) % bookHints.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setBookHintIndex((index) => (index - 1 + bookHints.length) % bookHints.length);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setBookHintOpen(false);
+        return;
+      }
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        commitBookHint(bookHints[bookHintIndex]);
+        return;
+      }
+    }
+
     if (e.key !== 'Enter' || searchText.trim() === '') return;
+
+    setBookHintOpen(false);
 
     const reference = parseReference(searchText);
     const book = reference && findBook(books, reference.bookQuery);
@@ -222,14 +278,44 @@ const SearchPanel = ({ onDisplayChange }) => {
         onChange={(next) => selectPassage({ chapter, verse: verseFrom, till: next })}
       />
 
-      <input
-        className={fieldClass}
-        type="text"
-        placeholder="Search"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        onKeyDown={handleSearchKeyDown}
-      />
+      <div className="relative">
+        <input
+          ref={searchInputRef}
+          className={`w-full ${fieldClass}`}
+          type="text"
+          placeholder="Search"
+          autoComplete="off"
+          value={searchText}
+          onChange={handleSearchChange}
+          onFocus={() => setBookHintOpen(true)}
+          onBlur={() => setBookHintOpen(false)}
+          onKeyDown={handleSearchKeyDown}
+        />
+
+        {hintsVisible && (
+          <ul
+            role="listbox"
+            className="absolute left-0 top-[calc(100%+4px)] z-50 max-h-60 min-w-full overflow-y-auto
+              rounded-[5px] border border-[#555] bg-[#1f2937] py-1 shadow-lg"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            {bookHints.map((bookName, index) => (
+              <li
+                key={bookName}
+                role="option"
+                aria-selected={index === bookHintIndex}
+                className={`cursor-pointer whitespace-nowrap px-3 py-2 text-base text-white ${
+                  index === bookHintIndex ? 'bg-[#007bff]' : 'hover:bg-[#374151]'
+                }`}
+                onMouseEnter={() => setBookHintIndex(index)}
+                onClick={() => commitBookHint(bookName)}
+              >
+                {bookName}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {searchActive && (
         <div className="flex items-center gap-2 text-[0.8rem] font-medium text-white">
