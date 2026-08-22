@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import { DOCUMENTATION } from './documentationContent';
+import Input from '../components/ui/Input';
+
+const DOCUMENTATION_LANGUAGES = [
+  { value: 'geo', label: 'GEO' },
+  { value: 'eng', label: 'ENG' },
+  { value: 'rus', label: 'RUS' },
+];
 
 const renderBlock = (block, index) => {
   switch (block.type) {
@@ -37,15 +44,14 @@ const DocumentationPage = () => {
 
   return (
     <div className="rounded-[10px] bg-card px-20 pb-20 pt-8 text-[#f5f5f5] shadow-[0_0_10px_rgba(0,0,0,0.5)] max-md:px-6">
-      <select
-        className="mb-8 rounded-[5px] border border-[#555] bg-[#1f2937] p-2 text-[#f5f5f5] focus:border-[#888] focus:outline-none"
+      <Input
+        type="select"
+        variant="doc"
+        className="mb-8"
         value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-      >
-        <option value="geo">GEO</option>
-        <option value="eng">ENG</option>
-        <option value="rus">RUS</option>
-      </select>
+        options={DOCUMENTATION_LANGUAGES}
+        onChange={setLanguage}
+      />
 
       <h1 className="mb-4 text-center text-[2.5rem] font-bold text-accent">{title}</h1>
 
@@ -53,7 +59,10 @@ const DocumentationPage = () => {
 
       <div className="mt-8 flex justify-start gap-8 max-sm:flex-col max-sm:gap-4">
         {[
-          { label: 'Messenger', href: 'https://www.facebook.com/daniel.abulashvili.5' },
+          {
+            label: 'Messenger',
+            href: 'https://www.facebook.com/daniel.abulashvili.5',
+          },
           { label: 'Telegram', href: 'https://t.me/Daniel170407' },
           { label: 'YouTube', href: youtube },
         ].map(({ label, href }) => (

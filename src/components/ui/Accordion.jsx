@@ -1,17 +1,16 @@
 import { useState } from 'react';
+import Button from './Button';
 
 const Accordion = ({ title, badge, defaultOpen = false, children }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className="w-full">
-      <button
-        type="button"
+      <Button
+        variant="heading"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="mt-4 flex w-full cursor-pointer items-center justify-between gap-3 border-none
-          bg-transparent p-0 text-left text-xl font-semibold text-[#e0e0e0] transition-colors
-          duration-200 hover:text-white"
+        className="mt-4"
       >
         <span className="flex items-center gap-2">
           {title}
@@ -35,7 +34,7 @@ const Accordion = ({ title, badge, defaultOpen = false, children }) => {
         >
           <path d="m6 9 6 6 6-6" />
         </svg>
-      </button>
+      </Button>
       <div className="mt-2 h-px w-full bg-[#e0e0e0]/20" />
 
       <div

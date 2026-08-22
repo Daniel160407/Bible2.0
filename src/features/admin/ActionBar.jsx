@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../components/ui/Button';
 import MadeBy from '../../components/ui/MadeBy';
 import { useOpenPresentView } from '../../hooks/useOpenPresentView';
 
@@ -46,14 +47,6 @@ const IconSpinner = (props) => (
   </svg>
 );
 
-const focusRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-panel';
-
-const actionClass =
-  'group flex min-w-[104px] flex-col items-center gap-1.5 rounded-xl border border-white/5 bg-white/[0.04] px-4 py-3 ' +
-  'text-[13px] font-medium text-white/85 transition-colors duration-200 hover:border-white/15 hover:bg-white/[0.09] ' +
-  `hover:text-white active:bg-white/[0.06] ${focusRing}`;
-
 const ActionBar = () => {
   const [isHidden, setIsHidden] = useState(false);
   const barRef = useRef(null);
@@ -83,21 +76,19 @@ const ActionBar = () => {
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[1000] flex flex-col items-center px-4 pb-4">
-      <button
+      <Button
         ref={toggleRef}
-        type="button"
+        variant="toggle"
         onClick={() => setIsHidden((hidden) => !hidden)}
         aria-expanded={!isHidden}
         aria-controls="action-bar-panel"
-        className={`pointer-events-auto mb-2 flex items-center gap-2 rounded-full border border-white/10 bg-panel/90 px-4 py-2
-          text-[13px] font-medium text-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur
-          transition-colors duration-200 hover:border-white/20 hover:bg-panel hover:text-white ${focusRing}`}
+        className="pointer-events-auto mb-2"
       >
         <IconChevron
           className={`h-4 w-4 transition-transform duration-300 ${isHidden ? '' : 'rotate-180'}`}
         />
         {isHidden ? 'Show menu' : 'Hide menu'}
-      </button>
+      </Button>
 
       <div
         id="action-bar-panel"
@@ -111,13 +102,11 @@ const ActionBar = () => {
           }`}
       >
         <div className="flex flex-col gap-3 p-3">
-          <button
-            type="button"
+          <Button
+            variant="accent"
             onClick={openPresentView}
             disabled={isChecking}
-            className={`flex items-center justify-center gap-2.5 rounded-xl bg-accent px-5 py-3.5 text-[15px] font-semibold
-              text-surface transition-[background-color,opacity] duration-200 hover:bg-[#ffd633]
-              disabled:cursor-not-allowed disabled:opacity-60 ${focusRing}`}
+            className="gap-2.5"
           >
             {isChecking ? (
               <IconSpinner className="h-5 w-5 animate-spin" />
@@ -125,25 +114,21 @@ const ActionBar = () => {
               <IconPresent className="h-5 w-5" />
             )}
             {isChecking ? 'Opening…' : 'Open Present View'}
-          </button>
+          </Button>
 
           <div className="grid grid-cols-3 gap-2">
-            <button type="button" onClick={() => window.open('/bible', '_blank')} className={actionClass}>
+            <Button variant="tile" onClick={() => window.open('/bible', '_blank')}>
               <IconBook className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-accent" />
               Bible
-            </button>
-            <button
-              type="button"
-              onClick={() => window.open('/documentation', '_blank')}
-              className={actionClass}
-            >
+            </Button>
+            <Button variant="tile" onClick={() => window.open('/documentation', '_blank')}>
               <IconDocs className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-accent" />
               Docs
-            </button>
-            <button type="button" onClick={() => navigate('/donation')} className={actionClass}>
+            </Button>
+            <Button variant="tile" onClick={() => navigate('/donation')}>
               <IconHeart className="h-5 w-5 text-white/60 transition-colors duration-200 group-hover:text-red-400" />
               Donate
-            </button>
+            </Button>
           </div>
         </div>
 

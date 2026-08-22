@@ -1,11 +1,12 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import Input from './Input';
 
 const Combobox = ({
   value,
   onChange,
   options,
   className = '',
-  buttonClassName = '',
+  variant = 'panel',
   listClassName = '',
   placeholder = '',
   disabled = false,
@@ -37,7 +38,9 @@ const Combobox = ({
 
   useEffect(() => {
     if (!open) return;
-    listRef.current?.children[activeIndex]?.scrollIntoView({ block: 'nearest' });
+    listRef.current?.children[activeIndex]?.scrollIntoView({
+      block: 'nearest',
+    });
   }, [open, activeIndex]);
 
   useEffect(() => {
@@ -107,9 +110,10 @@ const Combobox = ({
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
-      <input
+      <Input
         ref={inputRef}
-        className={`w-full ${disabled ? 'cursor-not-allowed' : open ? 'cursor-text' : 'cursor-pointer'} ${buttonClassName}`}
+        variant={variant}
+        className={`w-full ${disabled ? 'cursor-not-allowed' : open ? 'cursor-text' : 'cursor-pointer'}`}
         type="text"
         role="combobox"
         aria-expanded={open}
@@ -121,9 +125,9 @@ const Combobox = ({
         placeholder={open ? selectedLabel || placeholder : placeholder}
         value={query === null ? selectedLabel : query}
         title={selectedLabel}
-        onChange={(e) => {
+        onChange={(next) => {
           setOpen(true);
-          setQuery(e.target.value);
+          setQuery(next);
         }}
         onMouseDown={() => (open ? close() : openList())}
         onFocus={(e) => e.target.select()}
@@ -140,9 +144,7 @@ const Combobox = ({
             rounded-[5px] border border-[#555] bg-[#1f2937] py-1 shadow-lg ${listClassName}`}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {matches.length === 0 && (
-            <li className="px-3 py-2 text-sm text-[#9ca3af]">No matches</li>
-          )}
+          {matches.length === 0 && <li className="px-3 py-2 text-sm text-[#9ca3af]">No matches</li>}
           {matches.map((option, index) => (
             <li
               key={option.value}

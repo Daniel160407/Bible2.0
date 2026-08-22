@@ -1,3 +1,5 @@
+import Button from '../../components/ui/Button';
+
 const cardClass =
   'mb-[15px] animate-fade-in-up rounded-lg bg-card p-[15px] shadow-[0_2px_4px_rgba(0,0,0,0.3)] ' +
   'transition-[transform,box-shadow] duration-300 hover:-translate-y-[5px] hover:shadow-[0_6px_12px_rgba(0,0,0,0.4)]';
@@ -44,15 +46,14 @@ const VersePreview = ({ display, separatedVerse, onSeparate }) => {
           {verse.book ?? display.book} {verse.tavi}:{verse.muxli}
         </h1>
         <div className="mt-2.5 flex justify-center">
-          <button
-            className="h-[30px] w-[100px] cursor-pointer rounded-[10px] bg-[#757575] font-bold text-[#f4f4f4]
-              transition-[background-color,box-shadow] duration-300 hover:bg-[#909090]
-              hover:shadow-[0_0_5px_2px_rgba(117,117,117,0.5)] focus:outline-none
-              focus:shadow-[0_0_5px_2px_rgba(117,117,117,0.5)]"
+          <Button
+            variant="neutral"
+            size="none"
+            className="h-[30px] w-[100px] text-base"
             onClick={() => onSeparate(verse)}
           >
             Separate
-          </button>
+          </Button>
         </div>
       </div>
     ));

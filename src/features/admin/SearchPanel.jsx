@@ -12,19 +12,19 @@ import {
   mapBookIndexForLanguage,
 } from '../../lib/constants';
 import Combobox from '../../components/ui/Combobox';
+import Input from '../../components/ui/Input';
 import Loader from '../../components/ui/Loader';
+import Button from '../../components/ui/Button';
 import WelcomeFarmer from './WelcomeFarmer';
-
-const fieldClass =
-  'appearance-none rounded-[5px] border border-[#555] bg-field p-2 text-base leading-normal ' +
-  'text-white outline-none transition-[border-color,box-shadow] duration-150 ' +
-  'hover:border-[#007bff] focus:border-[#007bff] focus:shadow-[0_0_0_0.2rem_rgba(0,123,255,0.25)]';
 
 const SLOW_NETWORK_DELAY_MS = 2000;
 const BOOK_HINT_LIMIT = 8;
 
 const numberOptions = (count) =>
-  Array.from({ length: count }, (_, i) => ({ value: i + 1, label: String(i + 1) }));
+  Array.from({ length: count }, (_, i) => ({
+    value: i + 1,
+    label: String(i + 1),
+  }));
 
 const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
   const [language, setLanguage] = useState('geo');
@@ -75,10 +75,7 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
     () => (meta?.versions ?? []).map((item) => ({ value: item, label: item })),
     [meta],
   );
-  const bookOptions = useMemo(
-    () => books.map((book) => ({ value: book, label: book })),
-    [books],
-  );
+  const bookOptions = useMemo(() => books.map((book) => ({ value: book, label: book })), [books]);
   const bookHints = useMemo(() => {
     const query = searchText.trim().toLowerCase();
     if (query === '' || books.length === 0) return [];
@@ -139,7 +136,12 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchResults, searchActive]);
 
-  const selectPassage = ({ book = bookIndex, chapter: nextChapter = 1, verse = 1, till = null }) => {
+  const selectPassage = ({
+    book = bookIndex,
+    chapter: nextChapter = 1,
+    verse = 1,
+    till = null,
+  }) => {
     clearSearch();
     setPassageSuppressed(false);
     setBookIndex(book);
@@ -168,8 +170,8 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
     searchInputRef.current?.focus();
   };
 
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
+  const handleSearchChange = (next) => {
+    setSearchText(next);
     setBookHintOpen(true);
     setBookHintIndex(0);
   };
@@ -231,24 +233,19 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2.5 rounded-[10px] bg-[#1f2937] p-5">
-      <select
-        className={`${fieldClass} shrink-0 cursor-pointer`}
+      <Input
+        type="select"
+        className="shrink-0 cursor-pointer"
         value={language}
-        onChange={(e) => {
+        options={PREVIEW_LANGUAGES}
+        onChange={(next) => {
           clearSearch();
-          setLanguage(e.target.value);
+          setLanguage(next);
         }}
-      >
-        {PREVIEW_LANGUAGES.map(({ value, label }) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
+      />
 
       <Combobox
         className="min-w-0 flex-[1.5]"
-        buttonClassName={fieldClass}
         ariaLabel="Version"
         value={version}
         options={versionOptions}
@@ -257,7 +254,6 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
       <Combobox
         className="min-w-0 flex-1"
-        buttonClassName={fieldClass}
         ariaLabel="Book"
         value={bookNameForLanguage(books, bookIndex, language)}
         options={bookOptions}
@@ -266,7 +262,6 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
       <Combobox
         className="w-[60px] shrink-0"
-        buttonClassName={fieldClass}
         ariaLabel="Chapter"
         value={chapter}
         options={chapterOptions}
@@ -275,7 +270,6 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
       <Combobox
         className="w-[60px] shrink-0"
-        buttonClassName={fieldClass}
         ariaLabel="First verse"
         value={verseFrom}
         options={verseOptions}
@@ -284,7 +278,6 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
       <Combobox
         className="w-[60px] shrink-0"
-        buttonClassName={fieldClass}
         ariaLabel="Last verse"
         value={verseTill ?? verseFrom}
         options={verseTillOptions}
@@ -292,9 +285,9 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
       />
 
       <div className="relative min-w-[200px] flex-[2]">
-        <input
+        <Input
           ref={searchInputRef}
-          className={`w-full ${fieldClass}`}
+          className="w-full"
           type="text"
           placeholder="Search"
           autoComplete="off"
@@ -332,14 +325,9 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
 
       {searchActive && (
         <div className="flex items-center gap-2 text-[0.8rem] font-medium text-white">
-          <button
-            className="cursor-pointer rounded-[5px] bg-field px-3 py-2 transition-colors duration-150
-              hover:border-[#007bff] disabled:cursor-not-allowed disabled:opacity-40"
-            onClick={prevResultPage}
-            disabled={!hasPrevResults}
-          >
+          <Button variant="subtle" onClick={prevResultPage} disabled={!hasPrevResults}>
             Prev
-          </button>
+          </Button>
           <span>
             {searchResults === null
               ? 'Searching...'
@@ -347,61 +335,60 @@ const SearchPanel = ({ onDisplayChange, separatedVerse, onShow }) => {
                 ? `${resultTotal} result${resultTotal === 1 ? '' : 's'} · Page ${resultPage} of ${resultPageCount}`
                 : 'No results'}
           </span>
-          <button
-            className="cursor-pointer rounded-[5px] bg-field px-3 py-2 transition-colors duration-150
-              hover:border-[#007bff] disabled:cursor-not-allowed disabled:opacity-40"
-            onClick={nextResultPage}
-            disabled={!hasNextResults}
-          >
+          <Button variant="subtle" onClick={nextResultPage} disabled={!hasNextResults}>
             Next
-          </button>
+          </Button>
         </div>
       )}
 
       <div className="flex shrink-0 items-center">
-        <svg
+        <Button
+          variant="plain"
           onClick={() => stepVerse(-1)}
-          className="h-[30px] w-[30px] cursor-pointer text-[#edf8ff]"
-          stroke="currentColor"
-          fill="currentColor"
-          strokeWidth="0"
-          version="1.2"
-          baseProfile="tiny"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Previous verse"
+          className="h-[30px] w-[30px] p-0 text-[#edf8ff]"
         >
-          <path d="M18 11h-7.244l1.586-1.586c.781-.781.781-2.049 0-2.828-.781-.781-2.047-.781-2.828 0l-6.414 6.414 6.414 6.414c.39.391.902.586 1.414.586s1.023-.195 1.414-.586c.781-.781.781-2.049 0-2.828l-1.586-1.586h7.244c1.104 0 2-.896 2-2 0-1.105-.896-2-2-2z" />
-        </svg>
-        <svg
+          <svg
+            className="h-full w-full"
+            stroke="currentColor"
+            fill="currentColor"
+            strokeWidth="0"
+            version="1.2"
+            baseProfile="tiny"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M18 11h-7.244l1.586-1.586c.781-.781.781-2.049 0-2.828-.781-.781-2.047-.781-2.828 0l-6.414 6.414 6.414 6.414c.39.391.902.586 1.414.586s1.023-.195 1.414-.586c.781-.781.781-2.049 0-2.828l-1.586-1.586h7.244c1.104 0 2-.896 2-2 0-1.105-.896-2-2-2z" />
+          </svg>
+        </Button>
+        <Button
+          variant="plain"
           onClick={() => stepVerse(1)}
-          className="h-[30px] w-[30px] cursor-pointer text-[#edf8ff]"
-          stroke="currentColor"
-          fill="currentColor"
-          strokeWidth="0"
-          version="1.2"
-          baseProfile="tiny"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          aria-label="Next verse"
+          className="h-[30px] w-[30px] p-0 text-[#edf8ff]"
         >
-          <path d="M10.586 6.586c-.781.779-.781 2.047 0 2.828l1.586 1.586h-7.244c-1.104 0-2 .895-2 2 0 1.104.896 2 2 2h7.244l-1.586 1.586c-.781.779-.781 2.047 0 2.828.391.391.902.586 1.414.586s1.023-.195 1.414-.586l6.414-6.414-6.414-6.414c-.781-.781-2.047-.781-2.828 0z" />
-        </svg>
+          <svg
+            className="h-full w-full"
+            stroke="currentColor"
+            fill="currentColor"
+            strokeWidth="0"
+            version="1.2"
+            baseProfile="tiny"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M10.586 6.586c-.781.779-.781 2.047 0 2.828l1.586 1.586h-7.244c-1.104 0-2 .895-2 2 0 1.104.896 2 2 2h7.244l-1.586 1.586c-.781.779-.781 2.047 0 2.828.391.391.902.586 1.414.586s1.023-.195 1.414-.586l6.414-6.414-6.414-6.414c-.781-.781-2.047-.781-2.828 0z" />
+          </svg>
+        </Button>
       </div>
 
-      <button
-        className="shrink-0 cursor-pointer rounded-[5px] bg-[#28a745] px-4 py-2 text-base text-white
-          transition-colors duration-300 hover:bg-[#1e7e34] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]"
-        onClick={onShow}
-      >
+      <Button variant="success" className="shrink-0" onClick={onShow}>
         Show
-      </button>
+      </Button>
 
-      <button
-        className="shrink-0 cursor-pointer rounded-[5px] bg-[#dc3545] px-4 py-2 text-base text-white
-          transition-colors duration-300 hover:bg-[#c82333] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]"
-        onClick={handleClear}
-      >
+      <Button variant="danger" className="shrink-0" onClick={handleClear}>
         Clear
-      </button>
+      </Button>
 
       {loading && (
         <>

@@ -10,15 +10,18 @@ import {
   canonicalBookIndex,
   mapBookIndexForLanguage,
 } from '../lib/constants';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 import Loader from '../components/ui/Loader';
 import MadeBy from '../components/ui/MadeBy';
 
 const COOKIE_OPTIONS = { expires: 7 };
 
-const fieldClass =
-  'm-[5px] rounded-[5px] border border-[#55677d] bg-[#3d4f5e] p-2.5 text-base text-white ' +
-  'transition-[background-color,border-color] duration-300 hover:border-[#6e8bb0] hover:bg-[#465a6b] ' +
-  'focus:border-[#8ca3c4] focus:outline-none max-md:w-full max-md:text-sm max-sm:p-2 max-sm:text-xs';
+const numberOptions = (count) =>
+  Array.from({ length: count }, (_, i) => ({
+    value: i + 1,
+    label: String(i + 1),
+  }));
 
 const stripHtml = (html) => html.replace(/(<([^>]+)>)/gi, '');
 
@@ -83,20 +86,20 @@ const BiblePage = () => {
     Cookies.set('chapter', nextChapter, COOKIE_OPTIONS);
   };
 
-  const handleLanguageChange = (e) => {
-    setLanguage(e.target.value);
+  const handleLanguageChange = (next) => {
+    setLanguage(next);
     clearSearch();
     Cookies.remove('version');
-    Cookies.set('language', e.target.value, COOKIE_OPTIONS);
+    Cookies.set('language', next, COOKIE_OPTIONS);
   };
 
-  const handleVersionChange = (e) => {
-    setVersion(e.target.value);
-    Cookies.set('version', e.target.value, COOKIE_OPTIONS);
+  const handleVersionChange = (next) => {
+    setVersion(next);
+    Cookies.set('version', next, COOKIE_OPTIONS);
   };
 
-  const handleBookChange = (e) => {
-    const listIndex = books.indexOf(e.target.value) + 1;
+  const handleBookChange = (next) => {
+    const listIndex = books.indexOf(next) + 1;
     selectPassage({ book: canonicalBookIndex(listIndex, language) });
   };
 
@@ -140,55 +143,55 @@ const BiblePage = () => {
   return (
     <div className="rounded-[10px] bg-panel p-5 text-white">
       <div className="mb-5 flex flex-wrap items-center max-md:flex-col max-md:items-stretch">
-        <select className={`${fieldClass} w-[200px]`} value={language} onChange={handleLanguageChange}>
-          {PREVIEW_LANGUAGES.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select className={`${fieldClass} w-[200px]`} value={version} onChange={handleVersionChange}>
-          {versions.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-        <select className={`${fieldClass} w-[200px]`} value={bookName} onChange={handleBookChange}>
-          {books.slice(FIRST_BOOK_INDEX - 1).map((book) => (
-            <option key={book} value={book}>
-              {book}
-            </option>
-          ))}
-        </select>
-        <select
-          className={`${fieldClass} w-[200px]`}
+        <Input
+          type="select"
+          variant="page"
+          className="w-[200px]"
+          value={language}
+          options={PREVIEW_LANGUAGES}
+          onChange={handleLanguageChange}
+        />
+        <Input
+          type="select"
+          variant="page"
+          className="w-[200px]"
+          value={version}
+          options={versions}
+          onChange={handleVersionChange}
+        />
+        <Input
+          type="select"
+          variant="page"
+          className="w-[200px]"
+          value={bookName}
+          options={books.slice(FIRST_BOOK_INDEX - 1)}
+          onChange={handleBookChange}
+        />
+        <Input
+          type="select"
+          variant="page"
+          className="w-[200px]"
           value={chapter}
-          onChange={(e) => selectPassage({ chapter: Number(e.target.value) })}
-        >
-          {Array.from({ length: chapterData?.chapterCount ?? 0 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {i + 1}
-            </option>
-          ))}
-        </select>
-        <select
-          className={`${fieldClass} w-[200px]`}
+          options={numberOptions(chapterData?.chapterCount ?? 0)}
+          onChange={(next) => selectPassage({ chapter: Number(next) })}
+        />
+        <Input
+          type="select"
+          variant="page"
+          className="w-[200px]"
           value={highlightedVerse ?? ''}
-          onChange={(e) => setHighlightedVerse(Number(e.target.value))}
-        >
-          <option value="" disabled hidden />
-          {Array.from({ length: chapterData?.verseCount ?? 0 }, (_, i) => (
-            <option key={i + 1} value={i + 1}>
-              {i + 1}
-            </option>
-          ))}
-        </select>
-        <input
-          className={`${fieldClass} max-w-[150px] placeholder:italic placeholder:text-[#b0b0b0] focus:shadow-[0_0_8px_#6e8bb0]`}
+          options={[
+            { value: '', label: '', disabled: true, hidden: true },
+            ...numberOptions(chapterData?.verseCount ?? 0),
+          ]}
+          onChange={(next) => setHighlightedVerse(Number(next))}
+        />
+        <Input
           type="text"
+          variant="page"
+          className="max-w-[150px] placeholder:italic placeholder:text-[#b0b0b0] focus:shadow-[0_0_8px_#6e8bb0]"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={setSearchText}
           onKeyDown={handleSearchKeyDown}
           placeholder="Search verses..."
         />
@@ -227,14 +230,15 @@ const BiblePage = () => {
               <h1 className="text-base font-bold text-[#b2b2b2] max-md:text-sm max-sm:text-xs">
                 {verse.book || bookName} {verse.tavi}:{verse.muxli}
               </h1>
-              <img
-                src="/images/copy.png"
-                alt="Copy"
+              <Button
+                variant="plain"
                 onClick={() => handleCopy(verse)}
-                className="invisible absolute bottom-2.5 right-2.5 h-6 w-6 cursor-pointer opacity-0
-                  transition-[opacity,visibility,transform] duration-300 hover:scale-[1.2]
-                  group-hover:visible group-hover:opacity-100"
-              />
+                aria-label="Copy verse"
+                className="invisible absolute bottom-2.5 right-2.5 h-6 w-6 p-0 opacity-0
+                  hover:scale-[1.2] group-hover:visible group-hover:opacity-100"
+              >
+                <img src="/images/copy.png" alt="" className="h-full w-full" />
+              </Button>
             </div>
           );
         })}
@@ -243,36 +247,17 @@ const BiblePage = () => {
       <div className="mt-5 flex justify-center gap-2.5">
         {searchActive ? (
           <>
-            <button
-              onClick={prevResultPage}
-              disabled={!hasPrevResults}
-              className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
-                transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
-                focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]
-                disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
-            >
+            <Button variant="surface" onClick={prevResultPage} disabled={!hasPrevResults}>
               Previous
-            </button>
-            <button
-              onClick={nextResultPage}
-              disabled={!hasNextResults}
-              className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
-                transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
-                focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]
-                disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
-            >
+            </Button>
+            <Button variant="surface" onClick={nextResultPage} disabled={!hasNextResults}>
               Next
-            </button>
+            </Button>
           </>
         ) : (
-          <button
-            onClick={() => selectPassage({ chapter: chapter + 1 })}
-            className="cursor-pointer rounded-lg bg-card-active px-5 py-2.5 text-base text-[#f0f0f5]
-              transition-[background-color,transform] duration-300 hover:scale-105 hover:bg-card
-              focus:shadow-[0_0_8px_#4a4a6a] focus:outline-none active:scale-95 active:bg-[#1f2530]"
-          >
+          <Button variant="surface" onClick={() => selectPassage({ chapter: chapter + 1 })}>
             Next Chapter
-          </button>
+          </Button>
         )}
       </div>
 

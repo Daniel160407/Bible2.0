@@ -1,4 +1,5 @@
 import { toast } from 'sonner';
+import Button from './Button';
 
 const ICONS = {
   success: {
@@ -47,36 +48,32 @@ const ToastCard = ({ id, variant, title, description, actions }) => {
         {actions?.length ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {actions.map(({ label, onClick, primary }) => (
-              <button
+              <Button
                 key={label}
+                variant={primary ? 'light' : 'translucent'}
+                className="text-[13px]"
                 onClick={() => {
                   toast.dismiss(id);
                   onClick?.();
                 }}
-                className={`cursor-pointer rounded-md border-none px-3 py-1.5 text-[13px] font-medium
-                  transition-colors duration-200 ${
-                    primary
-                      ? 'bg-white text-surface hover:bg-white/85'
-                      : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white'
-                  }`}
               >
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
         ) : null}
       </div>
 
-      <button
+      <Button
+        variant="icon"
         onClick={() => toast.dismiss(id)}
         aria-label="Dismiss"
-        className="-mr-1 -mt-1 h-6 w-6 shrink-0 cursor-pointer self-start rounded-md border-none
-          bg-transparent text-white/35 transition-colors duration-200 hover:text-white"
+        className="-mr-1 -mt-1 shrink-0 self-start"
       >
         <svg viewBox="0 0 24 24" className="mx-auto h-3.5 w-3.5">
           <path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
-      </button>
+      </Button>
     </div>
   );
 };

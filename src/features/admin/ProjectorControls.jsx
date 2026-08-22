@@ -1,4 +1,6 @@
 import Accordion from '../../components/ui/Accordion';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
 import { usePresentViewWindows } from '../../hooks/usePresentViewWindows';
 import PresentViewMonitor from './PresentViewMonitor';
 import {
@@ -7,6 +9,12 @@ import {
   STROKE_COLORS,
   TEXT_COLORS,
 } from '../../lib/constants';
+
+const TEXT_ALIGNMENTS = [
+  { value: 'left', label: 'Left' },
+  { value: 'center', label: 'Center' },
+  { value: 'right', label: 'Right' },
+];
 
 const rowClass = 'my-2 flex w-full items-center gap-4 max-md:flex-wrap max-md:gap-2';
 const labelClass = 'w-[120px] shrink-0 text-base text-[#e0e0e0] max-md:w-full max-sm:text-sm';
@@ -30,17 +38,16 @@ const ProjectorControls = ({
     <div className="flex w-full flex-col items-start gap-4">
       <div className="flex w-full items-start justify-center gap-5 max-md:flex-col max-md:items-center">
         <div className="flex flex-col items-center gap-1 max-md:w-full">
-          <button
+          <Button
+            variant="success"
             onClick={onShow}
             disabled={isShowPending}
-            className={`min-w-[100px] cursor-pointer rounded-[5px] bg-[#28a745] px-4 py-2 text-base
-            text-white transition-all duration-300 hover:bg-[#1e7e34] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]
-            disabled:cursor-not-allowed disabled:opacity-60 max-md:w-full max-md:max-w-[200px] ${
+            className={`min-w-[100px] max-md:w-full max-md:max-w-[200px] ${
               showError ? 'animate-pulse-error' : ''
             }`}
           >
             Show
-          </button>
+          </Button>
           {showError ? (
             <div className="flex w-0 min-w-0 justify-center max-md:w-full">
               <p
@@ -52,14 +59,13 @@ const ProjectorControls = ({
             </div>
           ) : null}
         </div>
-        <button
+        <Button
+          variant="danger"
           onClick={onClear}
-          className="min-w-[100px] cursor-pointer rounded-[5px] bg-[#dc3545] px-4 py-2 text-base text-white
-          transition-all duration-300 hover:bg-[#bd2130] hover:shadow-[0_4px_8px_rgba(25,48,182,0.5)]
-          max-md:w-full max-md:max-w-[200px]"
+          className="min-w-[100px] max-md:w-full max-md:max-w-[200px]"
         >
           Clear
-        </button>
+        </Button>
       </div>
 
       <Accordion title="Languages to display" defaultOpen>
@@ -68,44 +74,19 @@ const ProjectorControls = ({
             <label className={labelClass} htmlFor={`language-${key}`}>
               {label}
             </label>
-            <span className="relative inline-flex shrink-0 items-center justify-center">
-              <input
-                id={`language-${key}`}
-                type="checkbox"
-                className="peer h-[22px] w-[22px] cursor-pointer appearance-none rounded-md border-2
-              border-[#e0e0e0]/30 bg-white/5 transition-all duration-200 ease-out
-              hover:border-[#28a745]/70 hover:bg-white/10 focus-visible:outline-none
-              focus-visible:ring-2 focus-visible:ring-[#28a745]/50 focus-visible:ring-offset-2
-              focus-visible:ring-offset-transparent active:scale-90 checked:border-[#28a745]
-              checked:bg-[#28a745] checked:shadow-[0_2px_8px_rgba(40,167,69,0.45)]
-              checked:hover:bg-[#1e7e34]"
-                checked={Boolean(enabledLanguages[key])}
-                onChange={(e) => onToggleLanguage(key, e.target.checked)}
-              />
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="pointer-events-none absolute h-[14px] w-[14px] scale-50 text-white opacity-0
-              transition-all duration-200 ease-out peer-checked:scale-100 peer-checked:opacity-100"
-              >
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            </span>
-            <select
-              className="control-select"
+            <Input
+              id={`language-${key}`}
+              type="checkbox"
+              checked={Boolean(enabledLanguages[key])}
+              onChange={(checked) => onToggleLanguage(key, checked)}
+            />
+            <Input
+              type="select"
+              variant="control"
               value={versions[key]}
-              onChange={(e) => onVersionChange(key, e.target.value)}
-            >
-              {(versionOptions[key]?.versions ?? [versions[key]]).map((version) => (
-                <option key={version} value={version}>
-                  {version}
-                </option>
-              ))}
-            </select>
+              options={versionOptions[key]?.versions ?? [versions[key]]}
+              onChange={(next) => onVersionChange(key, next)}
+            />
           </div>
         ))}
       </Accordion>
@@ -115,86 +96,74 @@ const ProjectorControls = ({
           <label className={labelClass} htmlFor="fonts">
             Fonts:
           </label>
-          <select
+          <Input
             id="fonts"
-            className="control-select"
+            type="select"
+            variant="control"
             value={style.font}
-            onChange={(e) => onStyleChange({ font: e.target.value })}
-          >
-            {PROJECTOR_FONTS.map((font) => (
-              <option key={font} value={font}>
-                {font}
-              </option>
-            ))}
-          </select>
+            options={PROJECTOR_FONTS}
+            onChange={(font) => onStyleChange({ font })}
+          />
         </div>
 
         <div className={rowClass}>
           <label className={labelClass} htmlFor="text-color">
             Text Color:
           </label>
-          <select
+          <Input
             id="text-color"
-            className="control-select"
+            type="select"
+            variant="control"
             value={style.textColor}
-            onChange={(e) => onStyleChange({ textColor: e.target.value })}
-          >
-            {TEXT_COLORS.map(({ value, label }) => (
-              <option key={value} value={value} style={{ color: value }}>
-                {label}
-              </option>
-            ))}
-          </select>
+            options={TEXT_COLORS.map(({ value, label }) => ({
+              value,
+              label,
+              style: { color: value },
+            }))}
+            onChange={(textColor) => onStyleChange({ textColor })}
+          />
         </div>
 
         <div className={rowClass}>
           <label className={labelClass} htmlFor="text-position">
             Text Position:
           </label>
-          <select
+          <Input
             id="text-position"
-            className="control-select"
+            type="select"
+            variant="control"
             value={style.textAlign}
-            onChange={(e) => onStyleChange({ textAlign: e.target.value })}
-          >
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
-          </select>
+            options={TEXT_ALIGNMENTS}
+            onChange={(textAlign) => onStyleChange({ textAlign })}
+          />
         </div>
 
         <div className={rowClass}>
           <label className={labelClass} htmlFor="text-stroke">
             Text Stroke:
           </label>
-          <select
+          <Input
             id="text-stroke"
-            className="control-select"
+            type="select"
+            variant="control"
             value={style.strokeColor}
-            onChange={(e) => onStyleChange({ strokeColor: e.target.value })}
-          >
-            <option value="">None</option>
-            {STROKE_COLORS.map(({ value, label }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
+            options={[{ value: '', label: 'None' }, ...STROKE_COLORS]}
+            onChange={(strokeColor) => onStyleChange({ strokeColor })}
+          />
         </div>
 
         <div className={rowClass}>
           <label className={labelClass} htmlFor="stroke-width">
             Stroke Width:
           </label>
-          <input
+          <Input
             id="stroke-width"
             type="range"
             min="0.1"
             max="2"
             step="0.1"
-            className="flex-1 cursor-pointer accent-[#28a745]"
             value={style.strokeWidth}
-            onChange={(e) => onStyleChange({ strokeWidth: Number(e.target.value) })}
+            onChange={(strokeWidth) => onStyleChange({ strokeWidth })}
           />
           <span className="text-white">{style.strokeWidth}</span>
         </div>

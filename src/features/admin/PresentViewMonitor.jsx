@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Button from '../../components/ui/Button';
 import { notify } from '../../components/ui/Toast';
 import { useOpenPresentView } from '../../hooks/useOpenPresentView';
 
@@ -43,9 +44,41 @@ const PresentViewThumbnail = ({ width, height }) => {
   );
 };
 
-const openButtonClass =
-  'cursor-pointer rounded-[5px] border-none bg-[#28a745] px-3 py-1.5 text-sm text-white ' +
-  'transition-colors duration-300 hover:bg-[#1e7e34] disabled:cursor-not-allowed disabled:opacity-60';
+const WindowControls = ({ onClose, closing }) => (
+  <span className="group/controls flex shrink-0 items-center gap-[6px]">
+    <button
+      type="button"
+      onClick={onClose}
+      disabled={closing}
+      title={closing ? 'Closing…' : 'Close'}
+      aria-label="Close window"
+      className="flex h-[12px] w-[12px] items-center justify-center rounded-full bg-[#ff5f57]
+        ring-1 ring-inset ring-black/20 transition-opacity duration-150 hover:brightness-110
+        disabled:cursor-default disabled:opacity-50"
+    >
+      <svg
+        viewBox="0 0 12 12"
+        aria-hidden="true"
+        className="h-[8px] w-[8px] opacity-0 transition-opacity duration-150 group-hover/controls:opacity-100"
+      >
+        <path
+          d="M3.5 3.5 L8.5 8.5 M8.5 3.5 L3.5 8.5"
+          stroke="#4d0000"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </button>
+    <span
+      aria-hidden="true"
+      className="h-[12px] w-[12px] rounded-full bg-[#febc2e] ring-1 ring-inset ring-black/20 opacity-60"
+    />
+    <span
+      aria-hidden="true"
+      className="h-[12px] w-[12px] rounded-full bg-[#28c840] ring-1 ring-inset ring-black/20 opacity-60"
+    />
+  </span>
+);
 
 const PresentViewMonitor = ({ windows, onCloseWindow, onCloseAllWindows }) => {
   const [closingIds, setClosingIds] = useState([]);
@@ -76,14 +109,9 @@ const PresentViewMonitor = ({ windows, onCloseWindow, onCloseAllWindows }) => {
       >
         <p className="text-sm font-semibold text-[#e0e0e0]">No Present View window is open</p>
         <p className="text-sm text-[#e0e0e0]/60">Open one to start presenting verses.</p>
-        <button
-          type="button"
-          onClick={openPresentView}
-          disabled={isChecking}
-          className={`mt-2 ${openButtonClass}`}
-        >
+        <Button variant="success" size="sm" onClick={openPresentView} disabled={isChecking} className="mt-2">
           Open Present View
-        </button>
+        </Button>
       </div>
     );
   }
@@ -91,23 +119,13 @@ const PresentViewMonitor = ({ windows, onCloseWindow, onCloseAllWindows }) => {
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex w-full flex-wrap items-center justify-end gap-2">
-        <button
-          type="button"
-          onClick={openPresentView}
-          disabled={isChecking}
-          className={openButtonClass}
-        >
+        <Button variant="success" size="sm" onClick={openPresentView} disabled={isChecking}>
           Open Present View
-        </button>
+        </Button>
         {windows.length > 1 && (
-          <button
-            type="button"
-            onClick={onCloseAllWindows}
-            className="cursor-pointer rounded-[5px] border-none bg-[#dc3545] px-3 py-1.5 text-sm
-              text-white transition-colors duration-300 hover:bg-[#bd2130]"
-          >
+          <Button variant="danger" size="sm" onClick={onCloseAllWindows}>
             Close all
-          </button>
+          </Button>
         )}
       </div>
 
@@ -120,26 +138,20 @@ const PresentViewMonitor = ({ windows, onCloseWindow, onCloseAllWindows }) => {
               hover:border-[#28a745]/40"
           >
             <div className="flex items-center justify-between gap-2 border-b border-[#e0e0e0]/10 bg-white/5 px-3 py-2">
-              <span className="flex min-w-0 items-center gap-2 text-sm font-semibold leading-none text-[#e0e0e0]">
+              <WindowControls
+                onClose={() => requestClose(id)}
+                closing={closingIds.includes(id)}
+              />
+              <span className="flex min-w-0 items-center justify-end gap-2 text-sm font-semibold leading-none text-[#e0e0e0]">
+                <span className="inline-flex h-5 shrink-0 items-center rounded-full bg-white/10 px-2 text-[11px] font-normal leading-none text-[#e0e0e0]/70">
+                  {width} &times; {height}
+                </span>
+                <span className="truncate leading-none">Window {index + 1}</span>
                 <span className="relative flex h-2 w-2 shrink-0 items-center justify-center">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#28a745] opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#28a745]" />
                 </span>
-                <span className="truncate leading-none">Window {index + 1}</span>
-                <span className="inline-flex h-5 shrink-0 items-center rounded-full bg-white/10 px-2 text-[11px] font-normal leading-none text-[#e0e0e0]/70">
-                  {width} &times; {height}
-                </span>
               </span>
-              <button
-                type="button"
-                onClick={() => requestClose(id)}
-                disabled={closingIds.includes(id)}
-                className="shrink-0 cursor-pointer rounded-[5px] border-none bg-[#dc3545] px-2.5 py-1 text-xs
-                  text-white transition-colors duration-300 hover:bg-[#bd2130]
-                  disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {closingIds.includes(id) ? 'Closing…' : 'Close'}
-              </button>
             </div>
 
             <div className="p-3">
